@@ -1,0 +1,347 @@
+/* =============================================================================
+   showcase.css — marketing sections for the commercial home variant.
+   Reuses the design-system tokens from styles.css; only the layout patterns
+   unique to this page (problem/solution, pillars, industries, voices) live here.
+   ========================================================================== */
+
+@keyframes hero-glow-breathe { 0%, 100% { opacity: 0.75; transform: translateX(-50%) scaleY(0.96); } 50% { opacity: 1; transform: translateX(-50%) scaleY(1.06); } }
+
+/* ---- editorial hero -------------------------------------------------------
+   One field, three overlapping zones: the cube is centred and absolute, the
+   copy sits over it at the lower-left, and the stat rail runs down the right
+   — genuine overlap rather than a tidy two-column split. Beams rake across
+   the stage, motes are the brand mark itself drifting (and, per showcase.js,
+   brightening toward the pointer), and a ledger marquee closes the section
+   along its bottom rule. Collapses to a plain stack under 1024px, where the
+   overlap and the side spines stop being legible.
+   -------------------------------------------------------------------- */
+.hero.editorial { position: relative; min-height: min(88svh, 800px); display: flex; flex-direction: column; justify-content: center; padding-block: clamp(1.4rem, 3vh, 2.4rem) 0; overflow: hidden; }
+.hero.editorial .hero-bg { background: none; }
+
+/* cube motes: the mark's own render, small and drifting in the margins, tinted
+   per theme (an invert filter would flip the etching's lighting, so it's a
+   separate render, not a filter). The hero follows the page's own theme
+   like everywhere else, so this just uses the site-wide --mote-img tokens
+   with no hero-specific override forcing the dark-toned art. */
+:root { --mote-img: url("assets/cube-lightmode.png"); }
+[data-theme="light"] { --mote-img: url("assets/cube-dark.png"); }
+.ed-motes { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+/* --lit (0-1) is written by showcase.js from the pointer's distance, so the
+   field responds to the cursor: nearby motes brighten, scale and drift toward
+   it via --px/--py. Six-ish is plenty — enough that each is an event, not texture. */
+.ed-motes i { position: absolute; left: var(--x); top: var(--y); width: var(--s); aspect-ratio: 631 / 701;
+  --lit: 0; --px: 0px; --py: 0px;
+  /* rendered as its own image, not a palette-tinted mask — only opacity
+     (and, on hover, brightness) may change; the render's own colour never does */
+  background-image: var(--mote-img);
+  background-size: contain; background-repeat: no-repeat; background-position: center;
+  opacity: calc(0.16 + var(--lit) * 0.5);
+  transform: translate(var(--px), var(--py)) scale(calc(1 + var(--lit) * 0.14));
+  transition: opacity 0.45s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.3, 1);
+  animation: ed-mote 18s ease-in-out var(--d) infinite; }
+@keyframes ed-mote { 0%, 100% { translate: 0 5px; } 50% { translate: 0 -7px; } }
+/* the drifting cubes also respond directly to touch/hover, on top of the
+   pointer-distance field above */
+.ed-motes i { pointer-events: auto; cursor: crosshair; transition: opacity 0.25s ease, filter 0.25s ease, scale 0.25s ease; }
+.ed-motes i:hover { opacity: 1 !important; filter: brightness(1.6); scale: 1.15; }
+@media (prefers-reduced-motion: reduce) { .ed-motes i { animation: none; transition: none; } }
+@media (max-width: 760px) { .ed-motes { display: none; } }
+
+/* light beams raking across the stage: long, thin, blurred gradients at a
+   shallow angle read as one raking source behind the object, palette-driven
+   so they follow the active colour rather than being baked in */
+.ed-beams { position: absolute; inset: -20% -10%; z-index: 0; pointer-events: none; }
+.ed-beams i { position: absolute; left: -20%; right: -20%; height: 1px; transform-origin: center; filter: blur(var(--bl, 22px)); opacity: 0; animation: ed-beam 14s ease-in-out infinite; }
+.ed-beams .b1 { top: 34%; --bl: 26px; height: 3px; background: linear-gradient(to right, transparent, color-mix(in oklch, var(--brand-2) 70%, transparent) 30%, color-mix(in oklch, var(--accent) 85%, transparent) 55%, transparent); transform: rotate(-13deg); animation-delay: 0s; }
+.ed-beams .b2 { top: 52%; --bl: 40px; height: 7px; background: linear-gradient(to right, transparent, color-mix(in oklch, var(--accent) 55%, transparent) 45%, color-mix(in oklch, var(--brand-3, var(--brand-2)) 45%, transparent) 70%, transparent); transform: rotate(-7deg); animation-delay: 2.4s; }
+.ed-beams .b3 { top: 22%; --bl: 18px; height: 2px; background: linear-gradient(to right, transparent 20%, color-mix(in oklch, var(--brand-1) 60%, transparent) 60%, transparent); transform: rotate(-19deg); animation-delay: 5.2s; }
+@keyframes ed-beam { 0%, 100% { opacity: 0.15; } 45% { opacity: 0.75; } }
+@media (prefers-reduced-motion: reduce) { .ed-beams i { animation: none; opacity: 0.4; } }
+
+/* rows sized to content and centred: an empty top band was the whole problem
+   with anchoring this field to the bottom */
+.ed-stage { position: relative; z-index: 2; flex: 1; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); align-items: center; gap: clamp(1.5rem, 3vw, 3rem); padding-block: clamp(1.5rem, 4vh, 3rem); }
+/* the shared .wrap caps at 1200px, sized for the rest of the site's sections.
+   The editorial hero also frames itself with .ed-spine running down the true
+   viewport edges, so on wide screens that 1200px cap left a huge, unbalanced
+   void between the content and the spines. Let this hero's rows (stage +
+   ledger) breathe wider so the framing stays proportional. */
+.hero.editorial .wrap { width: min(100% - 3rem, 1560px); }
+/* the object spans the whole field and sits behind everything */
+.ed-visual { position: absolute; z-index: 1; left: 50%; top: 50%; transform: translate(-50%, -50%); --ed-cap: 78vh; width: min(66%, 760px); display: grid; place-items: center; pointer-events: none; }
+.ed-visual::before { content: ""; position: absolute; left: 50%; top: 48%; transform: translate(-50%, -50%); width: min(160%, 1100px); aspect-ratio: 1 / 1; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, color-mix(in oklch, var(--accent) 30%, transparent) 0%, color-mix(in oklch, var(--accent) 13%, transparent) 26%, color-mix(in oklch, var(--brand-2) 6%, transparent) 48%, transparent 70%);
+  filter: blur(20px); animation: hero-glow-breathe 9s ease-in-out infinite; }
+/* cap the SVG itself: max-height on the wrapper cannot shrink a width-driven SVG */
+.ed-visual .hc-svg { position: relative; z-index: 2; aspect-ratio: 760 / 700; width: auto; max-width: 100%; height: auto; max-height: var(--ed-cap); overflow: visible; }
+/* the spines: rotated running labels down both edges, framing the stage like
+   a print sheet. The rules above/below each label stretch the full height,
+   so the pair reads as full-bleed columns rather than a single small tag. */
+.ed-spine { position: absolute; left: clamp(0.6rem, 1.6vw, 1.5rem); top: 0; bottom: 0; z-index: 3; display: flex; align-items: center; gap: 0.9rem; transform: rotate(180deg); writing-mode: vertical-rl; font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--text-2); pointer-events: none; }
+.ed-spine.right { left: auto; right: clamp(0.6rem, 1.6vw, 1.5rem); }
+.ed-spine i { flex: 1; width: 1px; background: linear-gradient(to bottom, var(--accent), transparent); }
+.ed-spine i.up { background: linear-gradient(to top, var(--accent), transparent); }
+@media (max-width: 1200px) { .ed-spine { display: none; } }
+
+/* anchored to the top of the row (align-self overrides .ed-stage's own
+   align-items: center) so the whole copy block — kicker, headline, sub
+   copy, CTA — sits top-left of the cube instead of vertically centred
+   beside it */
+.ed-copy { position: relative; z-index: 3; grid-column: 1; align-self: start; display: flex; flex-direction: column; align-items: start; }
+.ed-title { margin: 0 0 clamp(1.2rem, 2.6vh, 1.8rem); line-height: 1.08; letter-spacing: -0.028em; }
+/* 58px is the floor, not a fixed value: clamp's min guarantees the normal/
+   laptop-adjacent range (up to ~1930px) never goes below the original size,
+   while wide screens beyond that grow a bit further instead of staying
+   capped at the width tuned for a much narrower reference viewport. */
+.ed-title .ln { display: block; white-space: nowrap; font-size: clamp(3.625rem, 2.2vw + 1.2rem, 4.5rem); }
+/* --gradient-text, the same palette-driven text-clip gradient documented
+   in Design System.html (and demoed on this exact headline there), rather
+   than a flat colour. Punctuation still carries its own solid accent via
+   .ln em, painted on top of the clipped gradient beneath it. */
+.ed-title, .ed-title .ln { background: var(--gradient-text); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+.ed-title em { font-style: normal; color: var(--accent-text); -webkit-text-fill-color: var(--accent-text); }
+.ed-cta { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.ed-cta .btn { flex: none; white-space: nowrap; }
+/* the single action on the page: a quiet glass pill rather than a filled
+   slab, with the accent living only in the arrow. Tinted from var(--bg)/
+   var(--text) rather than fixed black/white, so the "glass" tints toward
+   whichever ground is actually behind it. */
+.ed-cta .btn-primary { position: relative; gap: 0.8em; padding: 0.72em 1.35em 0.72em 0.72em; border-radius: 999px; font-size: 0.98rem; font-weight: 600; letter-spacing: 0.005em;
+  color: var(--text); background: color-mix(in oklch, var(--bg) 34%, transparent);
+  border: 1px solid color-mix(in oklch, var(--text) 20%, transparent); box-shadow: none;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s var(--ease); }
+.ed-cta .btn-primary::before { content: ""; flex: none; order: -1; display: block; width: 1.5em; aspect-ratio: 631 / 701;
+  /* rendered as its own image, same as the field motes — no palette tint */
+  background-image: var(--mote-img);
+  background-size: contain; background-repeat: no-repeat; background-position: center;
+  animation: ed-btn-cube 5s ease-in-out infinite; }
+@keyframes ed-btn-cube { 0%, 100% { transform: rotate(-5deg) scale(0.97); } 50% { transform: rotate(5deg) scale(1.03); } }
+.ed-cta .btn-primary .ico { color: var(--accent-text); transition: transform 0.28s var(--ease); }
+.ed-cta .btn-primary:hover { transform: translateY(-2px); background: color-mix(in oklch, var(--bg) 22%, transparent); border-color: color-mix(in oklch, var(--accent) 55%, transparent); }
+.ed-cta .btn-primary:hover .ico { transform: translateX(4px); }
+.ed-cta .btn-primary:active { transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .ed-cta .btn-primary::before { animation: none; }
+  .ed-cta .btn-primary:hover, .ed-cta .btn-primary:hover .ico { transform: none; }
+}
+
+/* the rotator: takes the column .ed-aside used to occupy, right of the
+   copy block. Three claims cross-fade through a shared 12s loop (4s each)
+   — pure CSS via staggered animation-delay, no JS timer to manage. Slides
+   are stacked with grid-area so no slide needs to know the others' height. */
+/* align-self only offers start/center/end — center plus a translateY nudge
+   gets a position between center and end without going all the way down */
+.ed-rotator { position: relative; z-index: 3; grid-column: 2; align-self: center; justify-self: end;
+  transform: translateY(50%);
+  display: grid; width: 100%; max-width: 24rem; }
+/* a hairline leader running up from the index number toward the top of the
+   column — same device as .ed-fig's tick and .ed-spine's rules elsewhere in
+   this hero. Dashed rather than solid for texture, fading to solid only
+   near the number, plus a small pulse of light that travels down it on a
+   loop — like a signal arriving at the number, not just a static rule. */
+.ed-rotator::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 100%;
+  width: 1px;
+  height: 140px;
+  background:
+    repeating-linear-gradient(to bottom,
+      color-mix(in oklch, var(--border-strong) 85%, transparent) 0 6px,
+      transparent 6px 14px),
+    linear-gradient(to bottom, transparent, color-mix(in oklch, var(--accent) 55%, transparent) 85%, var(--accent) 100%);
+  mask-image: linear-gradient(to bottom, transparent, black 25%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 25%);
+}
+.ed-rotator::after {
+  content: "";
+  position: absolute;
+  left: -2.5px;
+  bottom: 100%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-text);
+  box-shadow: 0 0 10px 3px color-mix(in oklch, var(--accent) 70%, transparent);
+  opacity: 0;
+  animation: er-pulse-travel 3.6s cubic-bezier(0.3, 0.1, 0.4, 1) infinite;
+}
+@keyframes er-pulse-travel {
+  0% { transform: translateY(-140px); opacity: 0; }
+  10% { opacity: 1; }
+  82% { opacity: 1; }
+  100% { transform: translateY(0); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ed-rotator::after { animation: none; opacity: 0; }
+}
+.er-slide { grid-area: 1 / 1; display: flex; flex-direction: column; gap: 0.6rem; opacity: 0;
+  animation: er-cycle 12s ease-in-out var(--d, 0s) infinite; }
+.er-n { font-family: var(--font-mono); font-size: 0.85rem; letter-spacing: 0.16em; color: var(--accent-text); }
+.er-slide h3 { margin: 0; font-size: clamp(1.4rem, 2vw, 1.75rem); line-height: 1.2; }
+.er-slide p { margin: 0; font-size: 1.05rem; line-height: 1.6; color: var(--text-2); }
+@keyframes er-cycle {
+  0% { opacity: 0; transform: translateY(6px); }
+  4%, 29% { opacity: 1; transform: translateY(0); }
+  33%, 100% { opacity: 0; transform: translateY(-6px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .er-slide { animation: none; opacity: 0; }
+  .er-slide:first-child { opacity: 1; }
+}
+@media (max-width: 1024px) { .ed-rotator { display: none; } }
+
+/* a hanging hairline so this reads as one column of instrument copy rather
+   than a loose paragraph. max-width is set here directly now that it sits
+   in .ed-copy instead of the old, narrower .ed-aside wrapper. */
+.ed-sub { position: relative; margin: 0 0 clamp(1.2rem, 2.6vh, 1.8rem); padding-left: 0.95rem; max-width: 34rem; font-size: var(--step-0); line-height: 1.65; color: var(--text-2); text-wrap: pretty; }
+.ed-sub::before { content: ""; position: absolute; left: 0; top: 0.3em; bottom: 0.3em; width: 3px; border-radius: 2px; background: color-mix(in oklch, var(--accent) 65%, transparent); }
+.ed-sub b { color: var(--text); font-weight: 600; }
+
+/* the bottom rule: what actually ships, running as a marquee — real
+   capability names, the honest equivalent of a client-logo rail */
+.ed-ledger { position: relative; z-index: 3; border-top: 1px solid color-mix(in oklch, var(--border) 70%, transparent); }
+.ed-ledger-row { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: clamp(1rem, 3vw, 2.4rem); padding-block: clamp(0.9rem, 2vh, 1.3rem); }
+.lg-k { font-family: var(--font-mono); font-size: 0.64rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-2); white-space: nowrap; }
+.ed-marquee { position: relative; overflow: hidden; -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent); }
+/* the strip is duplicated in the markup, so -50% is exactly one seamless loop */
+.mq-track { display: flex; width: max-content; gap: clamp(1.6rem, 3.5vw, 3rem); animation: mq 34s linear infinite; }
+@keyframes mq { to { transform: translateX(-50%); } }
+.mq-track span { font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.06em; color: var(--text-2); white-space: nowrap; }
+.ed-marquee:hover .mq-track { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .mq-track { animation: none; } }
+
+/* hairline HUD corners on the stage: two brackets, opposite corners only */
+.ed-stage::before, .ed-stage::after { content: ""; position: absolute; width: 26px; height: 26px; pointer-events: none; opacity: 0.5;
+  border: 1px solid var(--border-strong); }
+.ed-stage::before { top: 0.4rem; left: 0.2rem; border-right: 0; border-bottom: 0; }
+.ed-stage::after { bottom: 0.4rem; right: 0.2rem; border-left: 0; border-top: 0; }
+/* selecting hero copy keeps the palette. color:var(--text), not a hardcoded
+   white — on light theme the highlight itself is pale (accent mixed mostly
+   transparent over a light ground), and white text on a pale highlight has
+   no contrast. */
+.hero.editorial ::selection { background: color-mix(in oklch, var(--accent) 40%, transparent); color: var(--text); }
+
+/* laptop-width pass: this tighter, closer-together proportion — narrower
+   wrap, smaller headline, pulled-in columns — is the one that reads right,
+   confirmed against real screens up to a 1980px window. Runs from the
+   1024px stack breakpoint up through that, so a 1980px "normal" monitor
+   gets the same look as a 1366/1440 laptop panel instead of a separately
+   tuned wide-screen variant. The cube (.ed-visual) is untouched — it's
+   already pinned to its 760px cap well before this range starts. */
+@media (min-width: 1025px) and (max-width: 2000px) {
+  .hero.editorial .wrap { width: min(100% - 3rem, 1240px); }
+  .ed-title .ln { font-size: 44px; }
+  .ed-stage { gap: clamp(1rem, 2vw, 1.6rem); padding-inline: clamp(2rem, 7vw, 4.5rem); }
+  /* narrower than the base 34rem — at this width the paragraph was
+     stretching close to the full column instead of reading as a tight
+     block of copy next to the cube */
+  .ed-sub { max-width: 26rem; }
+}
+/* on a physically bigger ~1980px-class monitor the same 1240px box and 44px
+   headline sit with more room around them than on a 1366/1440 laptop panel,
+   so the text reads smaller relative to that space. Keep the laptop pass's
+   spacing (wrap/gap/padding above) — only scale the type up for this
+   upper slice of the range. */
+@media (min-width: 1700px) and (max-width: 2000px) {
+  .ed-title .ln { font-size: 62px; }
+  .ed-sub { font-size: clamp(1.25rem, 1vw, 1.06rem); }
+  /* independent from the laptop pass above — tune this range's spacing here */
+  .hero.editorial .wrap { width: min(100% - 3rem, 1600px); }
+  .ed-stage { gap: 5rem; padding-inline: 4.5rem; }
+}
+
+@media (max-width: 1024px) {
+  /* the 88svh min-height exists to give the wide overlap room to breathe;
+     once the zones stack instead, it just centres a much shorter content
+     block in a near-full-viewport box, leaving large dead gaps above and
+     below. Let the section size to its stacked content instead. */
+  .hero.editorial { min-height: auto; justify-content: flex-start; padding-block: clamp(0.5rem, 1.5vh, 0.8rem) 0; }
+  /* the overlap needs a wide field; stack the zones instead. Kicker leads
+     (eyebrow → headline reads in the normal order, instead of dropping a
+     bare, out-of-context headline first and explaining it after), then
+     title, both centred, nested inside .ed-copy — a grid/flex `order` can
+     only reorder direct children, not a grandchild — so .ed-copy is
+     unwrapped with display:contents, letting its own children (kicker,
+     title, CTA) place independently as direct items of .ed-stage.
+     .ed-stage's own `gap` (tuned for the wide two-column split above) is
+     zeroed out here and replaced with one small, uniform row gap — at 5
+     stacked rows the desktop gap (up to 3rem *between every row*) on top
+     of each element's own margin was what actually made this block feel
+     oversized, not any single element. Individual rows below carry no
+     margin of their own now; this one gap value is the only spacing. */
+  /* minmax(0, 1fr), not bare 1fr — a bare 1fr column's minimum size
+     defaults to the largest min-content of anything inside it, and
+     .ed-title .ln below is white-space:nowrap, whose min-content IS its
+     full unwrapped width. On the zh copy ("宜鼎集團 X 高通，") that's wider
+     than the phone viewport, so the *whole column* — and every sibling
+     sharing it via width:100%/justify-self:stretch (.ed-sub, the CTA) —
+     got forced that wide and overflowed off the right edge too. That's
+     what looked like "the paragraph/button have mismatched side margins"
+     in every screenshot: it was never a margin mismatch, it was the
+     whole row blown wider than the screen by the title alone. minmax(0,
+     1fr) caps the column's minimum at 0 so it can't be stretched by a
+     child's unshrinkable content. */
+  .ed-stage { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto auto; align-items: start; gap: 0.6rem; padding-block: 0.4rem clamp(1.5rem, 4vh, 3rem); }
+  .ed-copy { display: contents; }
+  .ed-title { grid-column: 1; grid-row: 1; margin: 0; text-align: center; min-width: 0; }
+  /* nowrap on the wide desktop layout keeps each .ln on one line, matching
+     the intended phrase break ("Innodisk X Qualcomm," / "Hands-on
+     Workshop."). A smaller mobile size (down from 9vw/2.5rem) makes each
+     phrase actually fit on one line on real phone widths again instead of
+     free-wrapping into 3-4 lines wherever the glyphs happen to run out of
+     room; white-space stays normal as a safety net for the rare narrower
+     device where a phrase still doesn't fit, rather than clipping it.
+     10vw/2.75rem (tried for more visual weight) broke the 2-line phrase
+     break on ordinary phone widths, not just the narrowest ones — dialed
+     back to a midpoint that measured out safely under that failure point
+     (confirmed: 9vw/2.5rem — the original default — already wrapped;
+     8vw/2.3rem held), while still landing bigger than the safe version. */
+  .ed-title .ln { white-space: normal; font-size: clamp(1.7rem, 8.5vw, 2.4rem); }
+  /* Bigger and closer to full-bleed — was intentionally shrunk (48vh ->
+     32vh, width capped at 27rem) to shorten the scroll to the CTA, but
+     that made the hero read as modest/safe instead of a statement piece.
+     Trading some of that scroll length back for visual impact. The glow
+     halo below is tied to --ed-cap via calc(), so it grows right along
+     with this, no separate retuning needed. */
+  .ed-visual { position: relative; left: auto; top: auto; transform: none; grid-column: 1; grid-row: 2; width: min(94%, 32rem); --ed-cap: 46vh; justify-self: center; }
+  /* The base rule's glow halo (.ed-visual::before, further up this file)
+     sizes itself off .ed-visual's own box width, not off the cube's
+     actual rendered size — the cube is capped by height (--ed-cap) via
+     .hc-svg's max-height, but .ed-visual's width here stays ~100% of the
+     column regardless of how small --ed-cap gets. Shrinking --ed-cap
+     above (48vh -> 32vh) therefore shrank the cube while leaving the
+     halo the same size, so the glow now reads oversized/disproportionate
+     next to it. Re-tie the halo to --ed-cap directly so it always scales
+     with whatever the cube actually renders at, on this breakpoint or any
+     future retuning of --ed-cap here. */
+  .ed-visual::before { width: min(calc(var(--ed-cap) * 1.45), 480px); }
+  /* Left-aligned again, matching the desktop treatment (and its hanging
+     hairline via ::before below) — a multi-line paragraph with inline
+     bold spans reads worse centred, since the bold words land at a
+     different horizontal position on every line instead of a stable left
+     edge. width:100% still matches the CTA's full-width box below; that
+     part of the original fix stays. */
+  .ed-sub { grid-column: 1; grid-row: 3; justify-self: center; width: 100%; text-align: left; max-width: none; }
+  /* the CTA stretches full-width instead of sizing to its label */
+  .ed-copy .ed-cta { grid-column: 1; grid-row: 4; justify-self: stretch; }
+  .ed-cta .btn-primary { width: 100%; justify-content: center; }
+  /* the "runs today" ticker crowds the stacked mobile layout under an
+     already-tall hero — dropped on mobile rather than squeezed in */
+  .ed-ledger { display: none; }
+  /* the HUD corners were sized to tightly frame the wide stage; stacked,
+     they'd span from the title to the bottom of the stat rail instead of
+     framing anything */
+  .ed-stage::before, .ed-stage::after { display: none; }
+}
+
+/* the shared .section-head caps at 56ch site-wide (right for a body
+   paragraph), but that same cap was forcing this section's headline to
+   wrap three lines and leave the rest of a wide screen empty. Widen just
+   this section's head, and re-cap the paragraph on its own so its line
+   length stays readable. */
+#why .section-head { max-width: 78ch; }
+#why .section-head p { max-width: 56ch; }
+

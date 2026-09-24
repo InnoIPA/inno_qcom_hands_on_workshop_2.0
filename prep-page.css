@@ -1,0 +1,1161 @@
+/* ============================================================
+   Pre-Install page — additions on top of docs.css that the real
+   design system does not already define. Uses docs.css's .prose
+   typography, .callout, .code-block, .table-wrap and .pager as-is,
+   but skips its 3-column .docs-layout (no .docs-side / .docs-toc
+   sidebars — see .pi-page below) since the reference is a single
+   centered page. The zh/en toggle (.zh-only/.en-only, .lang-toggle)
+   comes from invite-blocks.css, shared with the Invitation page.
+   ============================================================ */
+
+/* This page's code blocks drop the redundant .lang tag (docs.css shows
+   "PowerShell" via .fname AND "POWERSHELL" via .lang in the same header —
+   the same word twice). With .lang gone, dock .code-copy to the right
+   edge itself so the header still reads as label-left / action-right. */
+.pi-page .code-head .code-copy { margin-left: auto; }
+
+/* docs.css's .ct-bar/.ct-tab reads as a row of underlined text labels
+   (border-bottom on the active one, transparent background otherwise) —
+   fine for a tab strip glued to the top of a single code block, but on
+   this page a mode switch (offline/online) sometimes precedes several
+   paragraphs, callouts and code blocks, not just one — glued underline
+   tabs read as ambiguous prose there, not an obvious toggle. Restyle it
+   here as a rounded segmented switch instead, on the exact same pattern
+   as the header's zh/en .lang-toggle: a pill track with a solid-fill
+   active button, which reads as "a choice" at a glance regardless of
+   what kind of content follows. Scoped to .pi-page so Docs.html's own
+   code-tabs (still glued to a single code block there) are untouched. */
+.pi-page .code-tabs { margin: 1.6rem 0 0; }
+.pi-page .ct-bar {
+  display: inline-flex; gap: 0.15rem;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0.2rem;
+}
+.pi-page .ct-tab {
+  border-radius: 999px; padding: 0.4rem 1rem;
+  border-bottom: 0; font-family: var(--font-ui); font-weight: 600;
+}
+.pi-page .ct-tab.active {
+  background: var(--accent); color: var(--on-accent);
+  border-bottom: 0;
+}
+.pi-page .code-tabs .code-block { margin-top: 1.4rem; border-radius: 12px; border-top: 1px solid #262f42; }
+/* method-tag: names WHICH sub-method a code-tabs panel is (Step 5.2's
+   offline/online modes are genuinely different procedures — "copy a
+   pre-quantized model" vs. "run qc quantization" — not just the same
+   task run two ways, so it needs its own label). A second <h3> right
+   under the step's own <h2> read as two competing headlines stacked on
+   top of each other (mode-head's h2 + this h3 both bold, both close to
+   the same size) — a small pill instead reads as a tag on the content,
+   not a second title. */
+.method-tag {
+  display: inline-flex; align-items: center;
+  margin: 0 0 0.7rem; padding: 0.28rem 0.8rem;
+  border-radius: 999px; background: var(--accent-soft); color: var(--accent-text);
+  font-size: 0.82rem; font-weight: 600;
+}
+
+/* the switch sitting beside the step's own heading turned out fragile —
+   at exactly the width where the heading (shrunk to its minimum) and
+   the switch pill both still fit on one row, there was zero spare
+   pixel of margin, one font-rendering difference away from the switch
+   clipping past the edge instead of wrapping cleanly. Simpler and more
+   robust: the heading is a normal, full-width step heading like every
+   other step (wraps on its own like plain text always does), and the
+   switch is just the next block in flow — always its own row, same
+   left edge as the heading, no fitting math to get wrong. */
+.pi-page .ct-bar { margin: 0 0 1rem; }
+
+/* The prereq box spells out raw URLs as link text (no spaces to wrap on) —
+   at narrow widths that forces the box, and the whole page, wider than the
+   viewport instead of wrapping. Let long tokens break anywhere — but not
+   inside .code-block, where code intentionally scrolls horizontally
+   instead of wrapping (docs.css sets white-space:pre there on purpose). */
+.pi-page a, .pi-page p code { overflow-wrap: anywhere; }
+
+/* Single-column page — no .docs-side / .docs-toc sidebars. The reference
+   mock is a plain centered page, not the site's 3-column docs layout, so
+   this page skips docs.css's .docs-layout grid entirely. .prose itself
+   (max-width:760px, from docs.css) still carries all the article
+   typography; it just needs centering since it's no longer a grid child. */
+.pi-page { padding: 2.4rem 0 5rem; }
+.pi-page .prose {
+  /* docs.css's default max-width:760px is tuned for long-form prose; this
+   page is table/code/screenshot-heavy, and the reference runs content the
+   full width of its container (~1200px on a wide viewport — the same
+   figure as the site's own --maxw). Let .wrap's own cap be the only one:
+   drop .prose's narrower ceiling instead of picking a second number. */
+  max-width: none; margin-inline: auto;
+}
+/* an earlier pass capped paragraph/list text at 68ch so a line of prose
+   wouldn't run past a comfortable reading width — but a short instruction
+   or a callout only a couple sentences long doesn't read as "prose", it
+   reads as a ragged, mostly-empty box with the last line or two chopped
+   short for no visible reason. Full width (edge to edge, matching
+   tables/code/figures/the step sidebar) reads cleaner for this page's
+   actual content: short, boxed instructions, not long-form paragraphs. */
+.pi-page .prose p { margin-top: 1.3rem; }
+/* body copy inherited the site's --step-0 (18-20px) and --text (93%
+   lightness, near-white) — sized and lit for short doc paragraphs, not
+   the long run of step-by-step instructions this page is mostly made
+   of, where it read as both larger and brighter than it needed to be.
+   Dial both down for plain paragraphs/list items only; headings keep
+   full size and full --text brightness, and .lead (the page's opening
+   statement) is deliberately excluded so it stays the prominent intro
+   line rather than shrinking to body-copy weight. */
+.pi-page .prose p:not(.lead), .pi-page .prose li {
+  font-size: 0.95rem; color: var(--text-2);
+}
+/* the added margin-top above is meant for flowing paragraphs, but it's
+   specific enough (.pi-page .prose p) to also outrank docs.css's own
+   .callout p / .prereq .body p { margin: 0 } — which exist specifically
+   so a callout's flush-top text stays vertically aligned with its icon
+   (both flex siblings, icon pinned near the top). The extra margin
+   pushed the text down away from the icon while the icon stayed put —
+   a visible misalignment, not just a spacing tweak. Reassert margin:0
+   for every "icon + text" boxed component's body text, matching
+   specificity so this always wins regardless of source order. */
+.pi-page .prose .callout p,
+.pi-page .prose .prereq .body p,
+.pi-page .prose .pi-video-card__body p {
+  margin-top: 0;
+}
+.pi-page > .prose > .eyebrow { margin-top: 0.5rem; }
+.pi-h1 { margin: 0.7rem 0 0; }
+
+.pi-grad {
+  background: var(--gradient-text);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+/* docs.css ships .callout.note/.tip/.warn but no green "success" variant
+   (e.g. "you're done, this worked") — add it on the same pattern. Mixed
+   into transparent rather than var(--surface), matching .tip's own
+   --accent-soft and docs.css's .note/.warn: a wash of colour over
+   whatever's behind it reads better than averaging toward a flat opaque
+   neutral, and doesn't need to know var(--surface)'s exact value. */
+.callout.success { border-left-color: var(--success); background: color-mix(in oklch, var(--success) 10%, transparent); }
+.callout.success .ic { color: var(--success); }
+.callout.success .ct-body strong { color: var(--success); }
+/* .skill-flow itself already washes its whole card with var(--accent-soft)
+   — stacking .callout.success's own transparent wash on top of that
+   averages the two tints into a muddy blue-green instead of reading as
+   "success" clearly. Opaque var(--surface) instead, so it sits as a clean
+   card on top of the already-tinted parent rather than blending with it. */
+.skill-flow .callout.success { background: var(--surface); }
+
+/* Same box model as docs.css's .callout (10px radius, 0.95rem/1.1rem
+   padding, 0.92rem body text at regular weight) so an FAQ item reads as
+   the same family of box as the note/success callouts above it — only
+   the accent color should change between them, not the weight or shape. */
+.faq { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 1.2rem 0; }
+.faq + .faq { margin-top: 0.6rem; }
+/* oklch mixes by hue angle, and --warn (orange, hue 62) is much closer
+   to var(--border)/var(--surface-2)'s hue (this palette's blue, ~263)
+   going the "long way" than the short way — so oklch's default shorter-hue
+   interpolation swings through magenta/navy instead of a sensible warm
+   blend (confirmed by rendering both: oklch here produced a plainly
+   purple border and a navy-blue background instead of muted orange).
+   oklab mixes on Cartesian a/b instead of hue angle, so it can't wrap the
+   wrong way around the wheel. */
+.faq.faq-warn { border-color: color-mix(in oklab, var(--warn) 45%, var(--border)); }
+/* transparent, not var(--surface-2) — see docs.css's .callout.note/.warn
+   for why: mixing into an opaque neutral reads as flat/dull (confirmed by
+   rendering both side by side), a wash over transparent doesn't. */
+.faq.faq-warn summary { background: color-mix(in oklab, var(--warn) 10%, transparent); }
+.faq.faq-warn summary .ic { color: var(--warn); }
+.faq summary {
+  cursor: pointer; display: flex; align-items: center; gap: 0.8rem;
+  padding: 0.95rem 1.1rem; font-weight: 400; font-size: var(--step--1); line-height: 1.6;
+  list-style: none; background: var(--surface-2); color: var(--text);
+}
+.faq summary::-webkit-details-marker { display: none; }
+/* .ic is a bare <span> — without an explicit box it stays inline and
+   the SVG sits on the surrounding text's baseline, inheriting extra
+   space from the 0.92rem/1.6 line-height it's sitting inside (a couple
+   px more than the svg's own 20px). That extra space pushes the icon's
+   visual center down from where the flex row's align-items:center
+   thinks it is, reading as "icon sits a bit low against the text" even
+   though the box model is centered. display:inline-flex shrink-wraps
+   .ic to the svg's actual 20x20 size, same fix .callout .ic already
+   has via explicit width/height. */
+.faq summary .ic { flex: none; display: inline-flex; color: var(--accent-text); }
+.faq summary .ic svg { width: 20px; height: 20px; }
+.faq summary .chev { margin-left: auto; flex: none; width: 18px; height: 18px; transition: transform 0.2s var(--ease); }
+.faq[open] summary .chev { transform: rotate(180deg); }
+.faq .faq-body { padding: 1rem 1.1rem; border-top: 1px solid var(--border); font-size: var(--step--1); }
+.faq .faq-body > *:first-child { margin-top: 0; }
+
+/* ---- faq-success: a script step's "here's the DONE output you should
+   see" box. First cut wrapped the output in a second, unrelated dark
+   .code-block terminal chrome nested inside a neutral .faq — two flat
+   dark boxes stacked with no colour cue for "this means it worked",
+   which read as generic/ugly. Tint the whole disclosure green (same
+   oklab-mix pattern as .faq-warn) and print the output straight on that
+   tinted body in --success-coloured mono, no nested box, so "success"
+   is legible from the collapsed summary alone and the open state reads
+   as one coherent green panel instead of two boxes. ---- */
+.faq.faq-success { border-color: color-mix(in oklab, var(--success) 45%, var(--border)); }
+.faq.faq-success summary { background: color-mix(in oklab, var(--success) 10%, transparent); }
+.faq.faq-success summary .ic { color: var(--success); }
+.faq.faq-success .faq-body { background: color-mix(in oklab, var(--success) 6%, transparent); }
+.faq.faq-success .faq-body pre {
+  margin: 0; white-space: pre-wrap; font-family: var(--font-mono);
+  font-size: 0.82rem; line-height: 1.7; color: var(--success);
+}
+
+.table-wrap td.chk { text-align: center; }
+/* --success is a per-theme accent tuned for soft text/icon-on-tint use
+   (see .callout.success, .status-toggle) — in dark mode it's a pale mint
+   (#7ee0c5) meant to read as light text on a dark surface, not as an
+   opaque fill. Used as a solid badge background with a white checkmark on
+   top, that pale mint washes out to low-contrast and looks broken. A
+   checkmark badge reads as "done" the same way regardless of site theme,
+   so give it its own fixed green rather than following --success. */
+.table-wrap td.chk .badge {
+  display: inline-flex; width: 22px; height: 22px; border-radius: 50%;
+  background: #1a8f6e; color: #fff;
+  align-items: center; justify-content: center;
+}
+.table-wrap td.chk .badge svg { width: 13px; height: 13px; }
+
+/* important/emphasised text outside a callout (plain step-body <p><strong>)
+   had no colour at all — just the browser's default bold, same colour as
+   the surrounding sentence — so it didn't stand out the way a callout's
+   coloured <strong> does. Give it the brand accent colour so "this part
+   matters" reads consistently whether it's inside a callout or not.
+   Scoped to .pi-page (not docs.css's .prose generally) since this is a
+   deliberate choice for these workshop guide pages, not a site-wide one. */
+.pi-page .prose strong {
+  color: var(--accent-text);
+}
+
+/* circular step numbers to match the reference (docs.css's default
+   .prose ol counter is a rounded square) — scoped to this page only. */
+.pi-page .prose ol > li::before { border-radius: 50%; }
+
+/* ---- prereq: a bigger, more prominent callout for a hard requirement
+   (e.g. "register before you start"), borrowed layout-wise from the
+   original mock — icon-in-a-ring + eyebrow + heading — but built on our
+   own tokens (accent gradient, not the mock's pink/violet). ---- */
+.prereq {
+  display: flex; gap: 1rem; align-items: flex-start;
+  margin: 0.8rem 0; padding: 1.1rem 1.4rem;
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  background: var(--accent-soft);
+}
+.prereq .badge-ring {
+  flex: none; width: 38px; height: 38px; border-radius: 11px;
+  display: grid; place-items: center;
+  background: var(--gradient-btn); color: var(--on-accent);
+  box-shadow: 0 8px 20px var(--accent-glow);
+}
+.prereq .badge-ring svg { width: 18px; height: 18px; }
+.prereq .body { min-width: 0; }
+.prereq .body .k {
+  font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-text);
+  margin-bottom: 0.3rem;
+}
+.prereq .body h3 { margin: 0 0 0.35rem; font-size: 1.15rem; }
+.prereq .body p { margin: 0; color: var(--text-2); line-height: 1.6; }
+/* ---- prereq--inline: for a short one-liner prereq (the "bring this"
+   checklist cards) where stacking title above description just to have
+   them wastes a whole line — put them on the same row instead. Not
+   applied to every .prereq (the "register a Qualcomm account" card above
+   still has multi-line body copy that needs its own line). .k stays
+   full-width via flex-basis:100% so it's still its own line above. ---- */
+/* .prereq's own align-items:flex-start lines the badge up with the .k
+   label's line — barely visible when .body was three stacked lines tall,
+   but now that .body is just two short lines, the badge reads as sitting
+   too high instead of centered on the card. Center it on the whole
+   card instead now that the card itself is short. */
+.prereq--inline { align-items: center; }
+.prereq--inline .body {
+  display: flex; flex-wrap: wrap; align-items: baseline;
+  column-gap: 0.7rem; row-gap: 0.15rem;
+}
+.prereq--inline .body .k { flex-basis: 100%; margin-bottom: 0.1rem; }
+.prereq--inline .body h3 { margin: 0; flex: none; white-space: nowrap; }
+.prereq--inline .body p { margin: 0; flex: 1 1 240px; min-width: 0; }
+@media (max-width: 560px) {
+  /* .body's flex-wrap above packs h3 + p onto one line whenever they're
+     short enough to fit (e.g. "Mouse" + its one-line description), but
+     wraps them onto separate lines once they don't (e.g. "Ethernet
+     Adapter"'s longer pair) — so which cards get a bold title-on-its-
+     own-line and which get title+body run together as one line varies
+     card to card, depending on wording length, not by design. Force
+     everyone onto the same stacked shape (title line, then body line)
+     at phone width instead of leaving it to wrap-or-not chance. */
+  .prereq--inline .body { display: block; }
+  .prereq--inline .body h3,
+  .prereq--inline .body p { display: block; white-space: normal; }
+}
+/* no responsive handling at all previously — at phone widths the fixed
+   badge stole enough of the row that the text column (already
+   carrying full sentences and raw URLs) was squeezed down to roughly
+   half the card's width, wrapping every few words into a tall, narrow,
+   hard-to-read strip. Stack the badge above the text instead of beside
+   it once the card itself gets narrow, same fix as .pi-video-card below. */
+@media (max-width: 560px) {
+  .prereq { flex-direction: column; padding: 1rem 1.1rem; }
+  /* .prereq--inline's align-items:center (set above for the row layout,
+     to center the badge against the short one-line body) means "center"
+     on the cross axis — once .prereq goes column just above, the cross
+     axis flips to horizontal, so the badge drifts to the middle of the
+     card while the text stays left-aligned under it. Pin it back to the
+     left edge so badge and text share one edge, same as .skill-flow's
+     icon-left layout right below it on this page. */
+  .prereq--inline { align-items: flex-start; }
+}
+
+/* ---- pi-video-card: icon-left / text-right card with its own CTA button,
+   matching the mock's video-card layout (badge + eyebrow + heading + body
+   + button), on our tokens instead of the mock's pink/violet. Named pi-*
+   (not .video-card) since docs.css already defines a real, differently-
+   shaped .video-card used on other pages — reusing that name here would
+   pull in conflicting rules. ---- */
+.pi-video-card {
+  display: flex; gap: 1.3rem; align-items: flex-start;
+  margin: 1.5rem 0; padding: 1.8rem 2rem;
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  background: var(--surface-grad, var(--surface));
+}
+.pi-video-card__badge {
+  position: relative; flex: none; width: 48px; height: 48px; border-radius: 14px;
+  display: grid; place-items: center;
+  background: var(--gradient-btn); color: var(--on-accent);
+  box-shadow: 0 8px 20px var(--accent-glow);
+}
+.pi-video-card__badge svg { width: 20px; height: 20px; position: relative; z-index: 1; }
+/* a soft pulsing ring behind the play icon — the "this is watchable, click
+   me" nudge a static icon alone doesn't give. */
+.pi-video-card__badge::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  background: var(--accent); opacity: 0.55;
+  animation: pi-video-pulse 2.2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+@keyframes pi-video-pulse {
+  0% { transform: scale(1); opacity: 0.55; }
+  70% { transform: scale(1.7); opacity: 0; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pi-video-card__badge::before { animation: none; display: none; }
+}
+.pi-video-card__eyebrow {
+  font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-text);
+  margin-bottom: 0.35rem;
+}
+.pi-video-card__body h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+.pi-video-card__body > p { margin: 0 0 0.9rem; color: var(--text-2); }
+/* .prose a:not(.btn) (docs.css) outranks a single class on specificity and
+   would otherwise repaint this link accent-blue-on-blue — match it with an
+   equally-specific selector rather than !important. */
+.pi-video-card a.pi-video-card__link {
+  display: inline-flex; align-items: center; gap: 0.5rem; align-self: flex-start;
+  padding: 0.6rem 1.1rem; border-radius: 999px; white-space: nowrap;
+  background: var(--gradient-btn); color: var(--on-accent);
+  font-size: 0.86rem; font-weight: 600; border-bottom: none;
+}
+.pi-video-card__link svg { flex: none; }
+.pi-video-card__link svg { width: 14px; height: 14px; }
+.pi-video-card__body { min-width: 0; }
+/* same fix, same reason as .prereq above — no responsive handling meant
+   the fixed 48px badge squeezed the eyebrow/heading/body/button column
+   down to roughly half the card's width on a phone. */
+@media (max-width: 560px) {
+  .pi-video-card { flex-direction: column; padding: 1.4rem 1.3rem; }
+}
+
+/* ---- install flow: a mini in-page nav beside the 4 numbered install
+   steps, mirroring the mock's "Windows 流程" side list — separate from
+   the auto-generated .docs-toc on the far right, which lists the whole
+   page, not just this sub-flow. Not in docs.css; page-scoped here. ---- */
+.install-flow { display: grid; grid-template-columns: 168px 1fr; gap: 2.4rem; margin-top: 1.6rem; align-items: start; }
+/* grid items default to min-width:auto (their content's natural size),
+   so without this a wide child (the flex-wrapped mobile nav below, or a
+   long code line) can force the 1fr track — and the whole page — wider
+   than the viewport instead of shrinking or wrapping. */
+.install-flow > * { min-width: 0; }
+@media (max-width: 860px) { .install-flow { grid-template-columns: 1fr; } }
+.install-nav { position: sticky; top: 90px; display: flex; flex-direction: column; gap: 0.15rem; }
+.install-nav a {
+  display: flex; align-items: center; gap: 0.55rem;
+  padding: 0.4rem 0; color: var(--text-2); font-size: 0.88rem;
+}
+.install-nav a:hover { color: var(--text); }
+.install-nav a .n {
+  font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-3); flex: none;
+}
+@media (max-width: 860px) { .install-nav { position: static; flex-direction: row; flex-wrap: wrap; gap: 0.6rem 1.2rem; } }
+
+/* ---- install-nav-toggle / install-nav-list: on Script.html the step
+   list is 13 items long (Flashing/Pre-Install only ever had ~8), which
+   read as an unbroken wall of wrapped links at tablet/phone widths — no
+   grouping, nothing to scan. Collapse it behind a "Script steps ▾"
+   toggle there instead, closed by default; .install-nav-head-based pages
+   (Flashing, Pre-Install) are untouched since they never adopt this
+   markup. display:contents on desktop keeps the list's children direct
+   flex items of the sticky .install-nav column, same as before this
+   wrapper existed. ---- */
+.install-nav-toggle {
+  display: flex; align-items: center; gap: 0.5rem;
+  width: 100%; background: none; border: 0; padding: 0; margin: 0 0 0.5rem;
+  font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3);
+  cursor: default;
+}
+.install-nav-toggle__icon, .install-nav-toggle__count { display: none; }
+.install-nav-toggle .chev { display: none; flex: none; margin-left: auto; width: 14px; height: 14px; transition: transform 0.2s var(--ease); }
+.install-nav-list { display: contents; }
+@media (max-width: 860px) {
+  /* :has() beats the shared row/wrap rule above on specificity, so this
+     only applies to an .install-nav that actually contains the new
+     collapsible list — Flashing/Pre-Install's plain <a> children never
+     match and keep the existing wrap-row layout untouched. */
+  .install-nav:has(.install-nav-list) { flex-direction: column; flex-wrap: nowrap; gap: 0; align-items: stretch; }
+  /* below 860px this is the ONLY thing a reader sees of the sidebar until
+     they tap it, so it's built as a real card — icon chip + step count +
+     hover/active state — rather than the desktop version's plain small-
+     caps label, which read as an inert caption rather than something
+     tappable. */
+  .install-nav-toggle {
+    cursor: pointer; gap: 0.75rem; margin: 0;
+    padding: 0.85rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg);
+    background: var(--surface); text-transform: none; letter-spacing: normal;
+    font-family: var(--font-ui); font-size: 0.94rem; font-weight: 600; color: var(--text);
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .install-nav-toggle:hover { border-color: var(--accent); }
+  .install-nav-toggle[aria-expanded="true"] { border-color: var(--accent); background: var(--accent-soft); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+  .install-nav-toggle__icon {
+    display: grid; place-items: center; flex: none; width: 32px; height: 32px;
+    border-radius: 10px; background: var(--gradient-btn); color: var(--on-accent);
+    box-shadow: 0 6px 16px var(--accent-glow);
+  }
+  .install-nav-toggle__icon svg { width: 15px; height: 15px; }
+  .install-nav-toggle__label { display: flex; align-items: center; gap: 0.55rem; }
+  .install-nav-toggle__count {
+    display: inline-block; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700;
+    color: var(--accent-text); background: var(--accent-soft); border-radius: 999px; padding: 0.1rem 0.5rem;
+  }
+  .install-nav-toggle[aria-expanded="true"] .install-nav-toggle__count { background: var(--surface); }
+  .install-nav-toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
+  .install-nav-toggle .chev { display: block; color: var(--text-3); }
+  .install-nav-list { display: none; }
+  .install-nav-list.open {
+    display: flex; flex-direction: row; flex-wrap: wrap; gap: 0.6rem 1.2rem;
+    padding: 1rem; border: 1px solid var(--accent); border-top: 0;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg); background: var(--surface);
+  }
+}
+
+.install-steps { display: flex; flex-direction: column; }
+/* .install-step is itself a flex item of .install-steps (column direction),
+   so its default min-width:auto uses its content's min-content size — a
+   screenshot .fig img wants its full intrinsic pixel width no matter what
+   width:100% says, which blows the row (and the whole page) wider than a
+   phone viewport instead of letting the image shrink into it. */
+.install-step { display: flex; gap: 1.5rem; padding: 2rem 0; border-bottom: 1px solid var(--border); min-width: 0; }
+/* same flex min-width:auto gotcha as .install-flow above — the body next
+   to the fixed-width numeral needs this to actually shrink on narrow
+   viewports instead of pushing the page wider. flex:1 (not the default
+   flex:0 1 auto) is what actually guarantees it fills the rest of the row:
+   without flex-grow, a step whose content is narrower than the available
+   column (e.g. no wide screenshot to force a shrink-to-fit) left a visible
+   gap of blank page after the text — every step happened to look full-width
+   before only because its content was coincidentally wide enough to shrink
+   into place, not because anything required it. */
+.install-step-body { flex: 1; min-width: 0; }
+.install-step:last-child { border-bottom: none; padding-bottom: 0; }
+.install-step:first-child { padding-top: 0; }
+.install-step-num {
+  flex: none; font-family: var(--font-display); font-weight: 800;
+  font-size: 2.8rem; line-height: 1; color: var(--accent-text);
+  min-width: 2.2ch; padding-top: 0.15rem;
+}
+/* .prose h2 (docs.css) styles top-level section headings — border-top,
+   padding-top:1.6rem, margin-top:3rem — meant to separate a new page
+   section from whatever came before it. That same rule also matches these
+   step headings (nested inside .prose too), stamping an unwanted rule
+   and ~74px gap between every step's numeral and its own title. Reset it
+   so the heading sits flush with the numeral instead. */
+.install-step-body h2 { margin: 0 0 0.4rem; padding-top: 0; border-top: none; }
+.install-step-body > p:first-of-type { color: var(--text-2); margin-top: 0; }
+
+/* on a phone, a 2.8rem side-rail numeral spans the full height of the
+   step (heading + body + image) but only ever labels the heading — that
+   wastes width every line below it doesn't use. Fold it into the heading
+   line itself as a small inline badge instead, and let paragraph/list/
+   figure children each take the full row below. display:contents lifts
+   install-step-body's children up to be direct flex items of install-step
+   so the badge and heading can share a flex line while everything else
+   wraps onto its own. */
+@media (max-width: 640px) {
+  .install-step { flex-wrap: wrap; align-items: center; gap: 0.6rem; padding: 1.5rem 0; }
+  .install-step-num {
+    font-family: var(--font-mono); font-weight: 700; font-size: 0.92rem;
+    width: 1.9rem; height: 1.9rem; min-width: 0; padding: 0;
+    display: grid; place-items: center; border-radius: 8px;
+    background: var(--accent-soft);
+  }
+  .install-step-body { display: contents; }
+  .install-step-body h2 { flex: 1 1 160px; min-width: 0; margin: 0; }
+  /* min-width:0 is the fix, not just flex:1 1 100% — a flex item's
+     default min-width:auto uses its content's min-content size, and a
+     code-block's <pre> is white-space:pre (never wraps), so its
+     min-content equals its full unwrapped width. Without min-width:0
+     here, an <ol><li> wrapping a code-block refused to shrink below
+     that command's full width, forcing this row — and the whole page —
+     wider than the phone screen instead of just letting the code-block's
+     own overflow-x:auto handle it. */
+  .install-step-body > :not(h2) { flex: 1 1 100%; min-width: 0; margin: 0; }
+}
+
+/* ---- ts-modal: the troubleshooting write-ups (Script page) were a
+   popup dialog in the reference, not inline page sections — a reader
+   mid-step opens it, checks the fix, and closes it without losing their
+   place, which reading it as a same-page jump-and-scroll-back loses.
+   Nothing like this exists elsewhere in the design system yet, so it's
+   built fresh here on the same tokens as everything else (surface/
+   border/radius-lg), not the reference's own styling. ---- */
+.ts-modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  padding: 4vh 1.2rem;
+  /* flex, not grid: a grid item's percentage width resolves against its
+     own track, and an auto track under justify-items:center sizes to
+     the item's max-content instead of the container — so
+     .ts-modal-panel's width:100% (mobile breakpoint below) silently
+     did nothing and the panel rendered at its natural content width,
+     wider than the viewport, pushing the close button off-screen
+     entirely. A flex item's percentage width resolves against the
+     container's own content box, which is what we actually want here. */
+  align-items: flex-start; justify-content: center;
+  background: color-mix(in oklab, black 65%, transparent);
+  backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+}
+.ts-modal-overlay.open { display: flex; }
+.ts-modal-panel {
+  width: min(94vw, 760px); max-height: 88vh; overflow-y: auto;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+.ts-modal-head {
+  position: sticky; top: 0; z-index: 1; background: var(--surface);
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 1.1rem 1.3rem; border-bottom: 1px solid var(--border);
+}
+.ts-modal-head h3 { margin: 0; font-size: 1.1rem; flex: 1 1 auto; min-width: 0; }
+.ts-modal-close {
+  flex: none; width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center; color: var(--text-2);
+  background: var(--surface-2); border: 1px solid var(--border);
+  transition: color 0.15s, border-color 0.15s;
+}
+.ts-modal-close:hover { color: var(--text); border-color: var(--accent); }
+.ts-modal-close svg { width: 15px; height: 15px; }
+.ts-modal-body { padding: 1.3rem 1.4rem 1.6rem; }
+.ts-modal-body .prose { max-width: none; }
+.ts-modal-body .prose > *:first-child { margin-top: 0; }
+.ts-modal-body .prose ol > li::before { border-radius: 50%; }
+/* skill-flow-explain-modal (the beginner install walkthrough) needs to
+   outrank .pi-page .prose p:not(.lead), .pi-page .prose li's page-wide
+   0.95rem dial-down above — that rule is tuned for this page's normal
+   short doc paragraphs, not a step-by-step guide meant to be read at a
+   glance while also following along on a second screen. var(--step-1)
+   matches .lead/.prose h3's size instead of introducing a new one. */
+#skill-flow-explain-modal .prose p,
+#skill-flow-explain-modal .prose li {
+  font-size: var(--step-1); line-height: 1.6;
+}
+/* on mobile this used to go edge-to-edge with square corners and full
+   viewport height — indistinguishable from just being the page, which
+   defeats the entire "pop up, check it, dismiss back to where you were"
+   point of a modal. Anchor it to the bottom as a sheet instead: rounded
+   top corners, a visible sliver of dimmed backdrop above it, and a grab
+   handle — the same visual grammar a native bottom sheet uses to say
+   "this is dismissible, there's a page behind me." */
+@media (max-width: 640px) {
+  .ts-modal-overlay { padding: 0; align-items: flex-end; }
+  .ts-modal-panel { width: 100%; max-height: 86vh; border-radius: 18px 18px 0 0; }
+  .ts-modal-head { border-radius: 18px 18px 0 0; padding-top: 1.5rem; }
+  .ts-modal-head::before {
+    content: ""; position: absolute; top: 0.55rem; left: 50%;
+    width: 36px; height: 4px; border-radius: 999px;
+    background: var(--border-strong); transform: translateX(-50%);
+  }
+}
+
+/* Step 5.3/5.4's numbered sub-lists are "<strong>do this:</strong> rest
+   of the sentence" — the reference dims everything after the bold lead-
+   in (muted grey) so the action verb is what actually stands out; ours
+   rendered the whole sentence at full contrast, which read as flat/
+   uniform instead of "here's the action, here's the detail." Scoped to
+   .install-step-body so the troubleshooting modal's <ol> (plain
+   sentences, no bold lead-in) isn't affected — muting a sentence with
+   nothing bold to contrast against would just look like disabled text. */
+.install-step-body ol > li { color: var(--text-2); }
+.install-step-body ol > li strong { color: var(--text); }
+
+/* ---- img-gallery / img-link / img-lightbox: Step 5.4's reference shows
+   "Image 1/2/3" as small icon + text links, not photo thumbnails — the
+   image itself only appears once someone actually opens it, in the
+   lightbox overlay (same overlay/close-button language as .ts-modal,
+   just built for a single image instead of a dialog with a header). ---- */
+.img-gallery { display: flex; flex-wrap: wrap; gap: 0.4rem 1.3rem; margin-top: 0.7rem; }
+.img-link {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 0; padding: 0; cursor: zoom-in;
+  color: var(--accent-text); font-size: 0.9rem; font-weight: 600;
+  border-bottom: 1px solid color-mix(in oklch, var(--accent) 40%, transparent);
+  transition: border-color 0.15s;
+}
+.img-link:hover { border-bottom-color: var(--accent); }
+.img-link svg { width: 16px; height: 16px; flex: none; }
+
+.img-lightbox-overlay {
+  display: none; position: fixed; inset: 0; z-index: 210;
+  align-items: center; justify-content: center; padding: 4vh 4vw;
+  background: color-mix(in oklab, black 80%, transparent);
+}
+.img-lightbox-overlay.open { display: flex; }
+.img-lightbox-overlay img { max-width: 100%; max-height: 90vh; border-radius: 12px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5); }
+.img-lightbox-close {
+  position: fixed; top: 1.2rem; right: 1.2rem; z-index: 211;
+  width: 40px; height: 40px; border-radius: 50%;
+  display: grid; place-items: center; color: #fff;
+  background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: background 0.15s;
+}
+.img-lightbox-close:hover { background: rgba(255, 255, 255, 0.22); }
+.img-lightbox-close svg { width: 18px; height: 18px; }
+
+/* ---- step-shot: an actual screenshot for one of the .img-todo slots above
+   (once filled in). display:block on the <img> avoids the few stray
+   pixels of baseline whitespace an inline img leaves under itself. ---- */
+.step-shot {
+  display: block; margin: 0.55rem 0 0.15rem;
+  max-width: 100%; width: 100%;
+  border: 1px solid var(--border); border-radius: 10px;
+  box-shadow: var(--shadow);
+}
+
+/* ---- hint-hover: a short reminder that only shows on hover/focus, for a
+   step whose full detail isn't worth a permanent extra sentence (the
+   install walkthrough in the skill-flow explain modal). Same visual
+   language as .icon-btn[data-tip] above (arrow, var(--shadow), var(--ease))
+   rather than a from-scratch box — that one's already tuned; this just
+   swaps its nowrap trigger for a wrapping one so it works on a run of
+   inline text instead of only an icon button. ---- */
+.hint-hover {
+  position: relative; display: inline-block;
+  border-bottom: 1px dotted var(--text-3); cursor: help;
+}
+.hint-hover::after {
+  content: attr(data-tip);
+  position: absolute; top: calc(100% + 9px); left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  width: max-content; max-width: 240px; white-space: normal;
+  background: var(--text); color: var(--bg);
+  font-size: 0.72rem; font-weight: 400; line-height: 1.5;
+  padding: 0.5rem 0.65rem; border-radius: 7px;
+  box-shadow: var(--shadow);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.16s var(--ease), transform 0.16s var(--ease);
+  z-index: 70;
+}
+.hint-hover::before {
+  content: ""; position: absolute; top: calc(100% + 4px); left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  border: 5px solid transparent; border-bottom-color: var(--text);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.16s var(--ease), transform 0.16s var(--ease);
+  z-index: 70;
+}
+.hint-hover:hover::after, .hint-hover:hover::before,
+.hint-hover:focus-visible::after, .hint-hover:focus-visible::before {
+  opacity: 1; transform: translateX(-50%) translateY(0);
+}
+
+/* username@host / path halves of a terminal prompt line, so a transcript
+   reads the way a real terminal does instead of one flat colour. */
+/* --code-accent/--code-accent-2 both track the active colour palette's
+   two hues, which for the default "blue" palette sit only ~26° apart
+   (263.5 vs 237.4) — user@host and path rendered as two barely-
+   distinguishable blues instead of the reference's clearly two-tone
+   green/blue prompt. --success is a fixed green independent of palette
+   (real terminals colour the user green too), paired with the same
+   --code-accent blue used for the code paths — a real green/blue split
+   that also can't collapse into itself if someone picks a palette whose
+   h1/h2 land close together. */
+.code-block .term-user { color: var(--success); }
+.code-block .term-path { color: var(--code-accent); }
+
+/* a <button> standing in for docs.css's .prose a:not(.btn) link look,
+   since a modal trigger has to be a real button (no href to navigate
+   to) but should still read as "this is a link" inline in a sentence.
+   Originally a plain underlined text link — but once a step carried two
+   of these side by side (an info "what does this do?" trigger next to
+   the warn "having trouble?" one), identical blue-underline styling made
+   them read as one interchangeable blob. Rebuilt as small icon+label
+   chips, each carrying its own semantic color, so the two are
+   distinguishable at a glance and not just by reading the words. */
+.ts-open-row { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.8rem; }
+.pi-page .ts-open-link {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+  padding: 0.4rem 0.9rem 0.4rem 0.65rem; margin: 0;
+  border: 1px solid var(--border); border-radius: 999px;
+  background: var(--surface); color: var(--text-2);
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  /* A lone item wrapped in flex-wrap:wrap .ts-open-row still gets
+     shrunk to fill the row's full width once its label doesn't fit on
+     one line (flexbox only shrinks a wrapped item enough to stop it
+     overflowing, which — with nothing else sharing that line — means
+     "exactly the row's width"). That stretches this pill edge-to-edge
+     with centered 2-line text instead of staying a compact chip.
+     fit-content caps it back to its wrapped label's own natural width. */
+  max-width: fit-content;
+}
+.pi-page .ts-open-link .ic { display: inline-flex; flex: none; }
+.pi-page .ts-open-link .ic svg { width: 14px; height: 14px; }
+.pi-page .ts-open-link--info {
+  color: var(--accent-text); border-color: color-mix(in oklch, var(--accent) 35%, var(--border));
+}
+.pi-page .ts-open-link--info:hover { border-color: var(--accent); background: var(--accent-soft); }
+.pi-page .ts-open-link--warn {
+  color: var(--warn); border-color: color-mix(in oklab, var(--warn) 35%, var(--border));
+}
+.pi-page .ts-open-link--warn:hover {
+  border-color: var(--warn); background: color-mix(in oklab, var(--warn) 10%, transparent);
+}
+/* same trigger, styled to match the sidebar's plain nav links instead.
+   No explicit width here — .install-nav is a column flex on desktop
+   (align-items:stretch fills it to 168px for free, same as .install-nav
+   a) but becomes a wrapping horizontal row below 860px; a hardcoded
+   width:100% would force each button to claim the full row width there
+   and push everything after it off the right edge of the viewport
+   instead of wrapping. */
+.install-nav button {
+  display: flex; align-items: center; gap: 0.55rem;
+  padding: 0.4rem 0; color: var(--text-2); font: inherit; font-size: 0.88rem;
+  background: none; border: 0; cursor: pointer; text-align: left;
+}
+.install-nav button:hover { color: var(--text); }
+/* the two troubleshooting triggers sit below a divider in the desktop
+   sidebar — but display:contents on mobile/tablet dissolves that divider
+   box so the buttons rejoin .install-nav's own wrap flow as plain chips
+   next to the numbered steps, instead of sitting inside their own
+   bordered box mid-row (which reads as a stray, half-cut card there). */
+.install-nav-extra { margin-top: 0.6rem; padding-top: 0.6rem; border-top: 1px solid var(--border); }
+@media (max-width: 860px) { .install-nav-extra { display: contents; } }
+
+/* ---- video-link: small pill chip for "watch the tutorial video" —
+   repeats once per script step (Script page), so it needs to read as a
+   light, repeatable affordance rather than a full CTA button. The play
+   icon sits in its own gradient-filled circle (same accent language as
+   .prereq/.pi-video-card's badge) so it still reads as "watchable" at a
+   glance, without the weight of a solid full-width button on every step. ---- */
+.video-link {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  margin: 0.6rem 0 0; padding: 0.3rem 1rem 0.3rem 0.3rem;
+  border: 1px solid var(--border); border-radius: 999px;
+  background: var(--surface); color: var(--text-2);
+  font-size: 0.85rem; font-weight: 500; border-bottom: none;
+  transition: border-color 0.2s, color 0.2s, transform 0.2s, background 0.2s;
+}
+.video-link:hover {
+  border-color: var(--accent); color: var(--accent-text);
+  background: var(--accent-soft); transform: translateY(-1px);
+}
+.video-link__play {
+  flex: none; width: 26px; height: 26px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--gradient-btn); color: var(--on-accent);
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+.video-link__play svg { width: 10px; height: 10px; margin-left: 1px; }
+
+/* ---- resource cards: link-out cards for external repos/docs (Handouts
+   page). Same box language as .prereq/.pi-video-card (icon chip on
+   --accent-soft + accent border on hover) but lighter weight — no big CTA
+   button, just an inline "open" link — since these are plain outbound
+   links, not a single highlighted action. ---- */
+/* max track size capped at 320px (not 1fr) so a row with only one or two
+   cards doesn't stretch them edge-to-edge — the "Downloads" section (often
+   just a single card) was ballooning into a mostly-empty wide strip with
+   the icon/title crammed to the left and no redesigned layout for that
+   width. Capped cards just leave the leftover row space blank instead,
+   which reads better at every card count. */
+.resource-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 320px));
+  gap: 1rem; margin-top: 1.2rem;
+}
+.resource-card {
+  display: flex; flex-direction: column; gap: 0.7rem;
+  padding: 1.3rem 1.4rem; border: 1px solid var(--border); border-radius: var(--radius-lg);
+  background: var(--surface); transition: border-color 0.2s, transform 0.2s;
+}
+a.resource-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.resource-card .ic {
+  width: 38px; height: 38px; flex: none; display: grid; place-items: center;
+  background: var(--accent-soft); color: var(--accent-text); border-radius: 10px;
+}
+.resource-card .ic svg { width: 20px; height: 20px; }
+.resource-card h3 { margin: 0; font-size: 1.05rem; }
+/* .desc: a real explanatory sentence, for a card whose choice isn't
+   self-evident from the title alone (e.g. picking between the manual
+   script and the Agent Skill). Deliberately not .url's var(--font-mono) —
+   that face reads fine for a short path/label but wrong for prose. */
+.resource-card .desc { font-size: var(--step--1); color: var(--text-2); line-height: 1.5; margin: 0; }
+.resource-card .url {
+  font-family: var(--font-mono); font-size: 0.76rem; color: var(--text-3); word-break: break-all;
+}
+/* deadline callout for the download-link resource card — a plain .url
+   line reads as permanent, so a "this goes away" fact needs its own
+   warn-colored line rather than blending into the neutral metadata. */
+.resource-card .expiry {
+  font-family: var(--font-mono); font-size: 0.74rem; font-weight: 600; color: var(--warn);
+}
+.resource-card .go {
+  margin-top: auto; display: inline-flex; align-items: center; gap: 0.4rem;
+  font-family: var(--font-mono); font-size: 0.78rem; font-weight: 600; color: var(--accent-text);
+}
+.resource-card .go svg { width: 13px; height: 13px; transition: transform 0.15s; }
+a.resource-card:hover .go svg { transform: translate(2px, -2px); }
+/* ---- skill-flow: the "optional AI-assisted script" checklist card
+   (Handouts page). Every other checklist/callout box here reads as "here's
+   one thing" (icon + heading + paragraph) — this one is a *choice* (opt
+   into the Skill vs. just use the manual script), so it gets its own
+   shape: a numbered step chain instead of prose, on a dashed accent border
+   so it doesn't get mistaken for one of the REQUIRED .prereq cards above
+   it. The fallback line sits below its own dashed divider so the "needs X"
+   steps and the "don't have X? do this instead" escape hatch never run
+   into the same sentence. ---- */
+.skill-flow {
+  margin: 1.5rem 0; padding: 1.6rem 1.4rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--accent-soft);
+}
+.skill-flow__head { display: flex; align-items: center; gap: 0.9rem; margin-bottom: 0.7rem; }
+.skill-flow__badge {
+  flex: none; width: 40px; height: 40px; border-radius: 12px;
+  display: grid; place-items: center;
+  background: var(--gradient-btn); color: var(--on-accent);
+  box-shadow: 0 6px 16px var(--accent-glow);
+}
+.skill-flow__badge svg { width: 19px; height: 19px; }
+.skill-flow__eyebrow {
+  font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-text);
+  margin-bottom: 0.2rem;
+}
+.skill-flow__head h3 { margin: 0; font-size: 1.1rem; }
+.skill-flow__desc { margin: 0 0 1.1rem; color: var(--text-2); line-height: 1.7; }
+/* skill-flow__row: puts the numbered steps and the "install walkthrough"
+   button on the same line when there's room, wrapping the button below
+   once the steps alone are too wide to share a row (same flex-wrap
+   technique as .skill-flow__steps itself). */
+.skill-flow__row {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 0.5rem 1.2rem; margin: 0 0 1.1rem;
+}
+.skill-flow__steps {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0;
+  margin: 0; padding: 0;
+}
+.skill-flow__step { display: flex; align-items: center; gap: 0.6rem; }
+.skill-flow__step:not(:last-child)::after {
+  content: "\2192"; color: var(--text-3); margin: 0 0.7rem; font-size: 0.9rem;
+}
+.skill-flow__num {
+  flex: none; width: 24px; height: 24px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--surface); border: 1px solid var(--accent); color: var(--accent-text);
+  font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700;
+}
+.skill-flow__label { font-size: var(--step--1); color: var(--text); }
+
+/* ---- quant-diagram: FP32-vs-INT8 number-line SVG inside the "what does
+   quantization do?" modal (Script page). Boxed like a .code-block so it
+   reads as a supporting figure, not floating prose. ---- */
+/* the key sentence explaining the figure below it was originally a small
+   muted caption under the SVG — easy to skim past, when it's actually the
+   one sentence in this modal that matters most. Promote it above the
+   diagram as a bold, full-contrast, larger-than-body lead-in instead. */
+.quant-diagram__lead {
+  margin: 1rem 0 0; font-size: 1rem; font-weight: 700; color: var(--text);
+  text-align: center;
+}
+.quant-diagram {
+  margin: 0.6rem 0 1rem; padding: 1.1rem 1rem 0.4rem;
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.quant-diagram svg { width: 100%; height: auto; display: block; }
+@media (max-width: 560px) {
+  /* Same padding as .prereq's own mobile override just above — not just
+     close, exactly equal — so this card's badge lines up on the same
+     left edge as the three .prereq badges stacked right above it. */
+  .skill-flow { padding: 1rem 1.1rem; }
+  /* Match the .prereq cards right above this one on the page: badge
+     stacked above the eyebrow/title instead of beside them, so all four
+     checklist cards share one shape at phone width. */
+  .skill-flow__head { flex-direction: column; align-items: flex-start; }
+  .skill-flow__steps { flex-direction: column; align-items: flex-start; }
+  .skill-flow__step:not(:last-child)::after { content: "\2193"; margin: 0.15rem 0 0.15rem 11px; }
+}
+
+/* ---- wsl-arch: "why WSL?" modal diagram (Script page). First attempt
+   reused docs.css's .conn-diagram (a flat left-to-right node chain) —
+   wrong on two counts: it wrapped ugly at modal width once a 3rd node
+   didn't fit the row, and worse, it drew WSL2 as a peer "step between"
+   Windows and Ubuntu when it's actually a container Ubuntu runs *inside*
+   Windows in. Rebuilt as a containment diagram instead: an outer
+   "Windows host" boundary with the WSL2/Ubuntu box nested inside it, and
+   a separate physical Q911 device below connected by a single upward
+   arrow (usbipd forwarding it up into WSL2) — the arrow direction and
+   nesting now both match what's actually true, not just "boxes and
+   arrows that read left to right". ---- */
+.wsl-arch { margin: 1rem 0 0; display: flex; flex-direction: column; align-items: center; gap: 0; }
+.wsl-arch__host {
+  width: 100%; position: relative;
+  border: 1.5px dashed var(--border-strong); border-radius: var(--radius-lg);
+  padding: 2rem 1.2rem 1.2rem;
+  background: var(--surface);
+}
+.wsl-arch__host-label {
+  position: absolute; top: 0.7rem; left: 1rem;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3);
+}
+.wsl-arch__host-label svg { width: 14px; height: 14px; }
+.wsl-arch__box {
+  position: relative;
+  max-width: 300px; margin: 0 auto; text-align: center;
+  border: 1px solid var(--border-strong); border-radius: 14px;
+  padding: 1.1rem 1rem; background: var(--surface-2);
+}
+.wsl-arch__box--accent { border-color: var(--accent); background: var(--accent-soft); }
+/* a small mascot sticker in the corner — Tux for "this is Linux", a
+   little face on the plug for "this is a real physical gadget" — purely
+   decorative personality, doesn't compete with the icon badge that
+   actually carries the box's meaning. */
+.wsl-arch__sticker {
+  position: absolute; top: -10px; right: -8px;
+  width: 26px; height: 26px; display: grid; place-items: center;
+  font-size: 15px; border-radius: 50%;
+  background: var(--surface); border: 1px solid var(--border);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+}
+.wsl-arch__icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  display: grid; place-items: center; margin: 0 auto 0.6rem;
+  background: var(--gradient-btn); color: var(--on-accent);
+  box-shadow: 0 6px 16px var(--accent-glow);
+}
+.wsl-arch__icon svg { width: 19px; height: 19px; }
+.wsl-arch__title { font-weight: 700; }
+.wsl-arch__sub { display: block; color: var(--text-2); font-size: 0.85rem; margin-top: 0.25rem; }
+.wsl-arch__link {
+  display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+  color: var(--text-3); padding: 0.3rem 0;
+}
+.wsl-arch__link svg { width: 18px; height: 38px; }
+.wsl-arch .cl-lbl {
+  font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-2);
+  padding: 0.15rem 0.65rem; border: 1px solid var(--border); border-radius: 999px;
+  background: var(--surface-2);
+}
+/* the SMIL animateMotion driving the flow dot has no built-in respect for
+   prefers-reduced-motion (unlike a CSS @keyframes animation) — hide the
+   dot outright under that setting instead, leaving the plain static arrow. */
+@media (prefers-reduced-motion: reduce) {
+  .wsl-arch__flow-dot { display: none; }
+}
+
+/* ---- decode-race: "why is the camera channel slower?" modal (Script
+   page) — a plain bullet list didn't make the MJPEG-vs-h264 difference
+   feel real, just told the reader about it. Give each path its own lane
+   with a dot that actually moves at a different *quality* of motion, not
+   just a different speed number: the software-decode lane stutters
+   (uneven keyframe steps), the hardware-decode lane glides (linear) — the
+   animation itself demonstrates "choppy" vs "smooth" instead of describing it. */
+.decode-race { display: flex; flex-direction: column; gap: 0.8rem; margin: 1rem 0; }
+.decode-lane {
+  display: flex; align-items: center; gap: 0.9rem;
+  padding: 0.8rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.decode-lane__icon {
+  flex: none; width: 36px; height: 36px; border-radius: 10px;
+  display: grid; place-items: center;
+  background: var(--surface-2); color: var(--text-2);
+}
+.decode-lane--fast .decode-lane__icon { background: var(--gradient-btn); color: var(--on-accent); box-shadow: 0 4px 12px var(--accent-glow); }
+.decode-lane__icon svg { width: 18px; height: 18px; }
+.decode-lane__label { flex: none; width: 150px; display: flex; flex-direction: column; }
+.decode-lane__title { font-weight: 700; font-size: 0.92rem; }
+.decode-lane__sub { color: var(--text-3); font-size: 0.76rem; }
+.decode-lane__track {
+  position: relative; flex: 1; height: 8px; min-width: 60px;
+  border-radius: 999px; background: var(--surface-2); overflow: hidden;
+}
+.decode-lane__dot {
+  position: absolute; top: 50%; left: 0; width: 10px; height: 10px;
+  margin-top: -5px; border-radius: 50%; background: var(--text-3);
+}
+.decode-lane--slow .decode-lane__dot { background: var(--warn); animation: decode-lane-stutter 3.2s steps(1) infinite; }
+.decode-lane--fast .decode-lane__dot { background: var(--success); animation: decode-lane-glide 1.4s linear infinite; }
+@keyframes decode-lane-stutter {
+  0% { left: 0%; }
+  8% { left: 10%; }
+  30% { left: 10%; }
+  38% { left: 34%; }
+  62% { left: 34%; }
+  70% { left: 60%; }
+  92% { left: 60%; }
+  100% { left: 92%; }
+}
+@keyframes decode-lane-glide {
+  0% { left: 0%; }
+  100% { left: 92%; }
+}
+@media (max-width: 560px) {
+  .decode-lane { flex-wrap: wrap; }
+  .decode-lane__track { flex-basis: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .decode-lane__dot { animation: none; left: 40%; }
+}
+
+/* small pulsing aperture icon on the auto-exposure bullet — a still icon
+   there read as inconsistent with the two lanes' motion above it, and
+   the pulse itself doubles as "this is the thing that keeps re-adjusting". */
+.decode-aperture {
+  display: inline-flex; margin-right: 0.4rem; color: var(--accent-text);
+  animation: decode-aperture-pulse 2.4s ease-in-out infinite;
+}
+.decode-aperture svg { width: 15px; height: 15px; vertical-align: -2px; }
+@keyframes decode-aperture-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(0.92); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .decode-aperture { animation: none; }
+}
+
+/* AI Tutorial page — the run-through timeline ("what happens after you hit
+   Enter"). Uses this page's own design tokens throughout (var(--accent),
+   var(--warn), var(--surface), ...) so it stays theme-adaptive, unlike the
+   earlier real-UI mockups on this page which were deliberately hardcoded
+   to match a fixed external screenshot — this component isn't one. */
+.journey { margin: 1.5rem 0 0.5rem; }
+/* .journey__row (icon + title) is its own flex row with align-items:center,
+   so the icon centres against the title specifically — even when the title
+   wraps onto two lines — instead of centring against the whole step
+   (title + description), which is what put the icon noticeably above
+   center before. .journey__desc sits below as a separate block, indented
+   to line up with the title text rather than the icon. */
+.journey__step { position: relative; padding-bottom: 2.1rem; }
+.journey__step:last-child { padding-bottom: 0; }
+.journey__step::before {
+  content: "";
+  position: absolute;
+  left: 1.65rem;
+  top: 3.3rem;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+.journey__step:last-child::before { display: none; }
+.journey__row { display: flex; align-items: center; gap: 1.1rem; }
+.journey__num {
+  flex: none;
+  width: 3.3rem;
+  height: 3.3rem;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--accent);
+  color: var(--accent-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+.journey__num svg { width: 24px; height: 24px; }
+/* Both are <p> elements inside .prose, so docs.css's `.prose p { margin:
+   1rem 0 0; }` (one class + one element = higher specificity than a bare
+   single-class selector) was silently overriding the margin here no
+   matter what was written — the indent never actually applied. Qualifying
+   with the .journey__row/.journey__step ancestor (two classes) beats that
+   unconditionally, not just by source-order luck. */
+.journey__row .journey__title {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  font-weight: 700;
+  font-size: 1.6rem;
+  line-height: 1.3;
+  margin: 0;
+  color: var(--text);
+  /* CJK glyphs sit visually higher than the flex box's true center (the
+     line-height's leading pads more below the ideographic baseline than
+     above it), so align-items:center leaves the title a couple px below
+     the icon's optical center. Nudge it up to compensate. */
+  transform: translateY(-2px);
+}
+.journey__title .tag {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  font-weight: 600;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text-3);
+  white-space: nowrap;
+}
+.journey__step .journey__desc {
+  margin: 0.65rem 0 0 calc(3.3rem + 1.1rem);
+  font-size: 1.02rem;
+  line-height: 1.7;
+  color: var(--text-2);
+}
+.journey__step .ts-open-row { margin-left: calc(3.3rem + 1.1rem); }
+/* Gate step: a decision point, not a regular stage. A dashed circular
+   border renders with uneven, lopsided dash spacing in every browser
+   (dashes don't divide evenly around an arc) — a solid ring with a filled
+   warn-tinted background reads as "different" just as clearly, without
+   looking crooked. */
+.journey__step.is-gate .journey__num {
+  border-color: var(--warn);
+  color: var(--warn);
+  background: color-mix(in oklab, var(--warn) 16%, var(--surface));
+}
+.journey__step.is-gate .journey__title { color: var(--warn); }
+.journey__step.is-gate .journey__title .tag { background: color-mix(in oklab, var(--warn) 14%, var(--surface-2)); color: var(--warn); }
+/* Flash step is conditional (skip-able) — muted solid ring instead of the
+   accent colour used for the steps that always run. */
+.journey__step.is-optional .journey__num {
+  border-color: var(--text-3);
+  color: var(--text-2);
+  background: var(--surface-2);
+}
+@media (max-width: 480px) {
+  .journey__row { gap: 0.8rem; }
+  .journey__num { width: 2.6rem; height: 2.6rem; }
+  .journey__num svg { width: 19px; height: 19px; }
+  .journey__step::before { left: 1.3rem; top: 2.6rem; }
+  .journey__row .journey__title { font-size: 1.35rem; }
+  .journey__step .journey__desc { font-size: 0.95rem; margin-left: calc(2.6rem + 0.8rem); }
+  .journey__step .ts-open-row { margin-left: calc(2.6rem + 0.8rem); }
+}

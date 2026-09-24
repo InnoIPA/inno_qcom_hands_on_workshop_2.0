@@ -1,0 +1,707 @@
+/* ============================================================
+   iQ-Studio — docs & get-started layout
+   Reuses tokens from styles.css (:root + [data-theme]).
+   ============================================================ */
+
+/* callout colors (theme-aware) */
+:root {
+  --note: oklch(0.62 0.13 250);
+  --warn: oklch(0.72 0.16 62);
+}
+
+/* shared header: current page — persistent accent treatment, distinct from
+   the transient :hover surface so the active page is always identifiable */
+.nav-links a.current {
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  font-weight: 500;
+  position: relative;
+}
+.nav-links a.current::after {
+  content: "";
+  position: absolute;
+  left: 0.7rem;
+  right: 0.7rem;
+  bottom: 0.15rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--gradient-btn);
+}
+
+/* ---------- page shell ---------- */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-3);
+  flex-wrap: wrap;
+}
+.breadcrumb a {
+  color: var(--text-3);
+}
+.breadcrumb a:hover {
+  color: var(--accent-text);
+}
+.breadcrumb .sep {
+  opacity: 0.5;
+}
+
+/* ---------- main content (prose) ---------- */
+.doc-tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0 0;
+}
+.doc-tags .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.26rem 0.7rem;
+}
+.doc-tags .chip svg {
+  width: 12px;
+  height: 12px;
+}
+
+.prose {
+  max-width: 760px;
+}
+.prose h1 {
+  font-size: clamp(2rem, 1.5rem + 2vw, 3rem);
+  margin: 0.9rem 0 0;
+}
+.prose > p.lead {
+  font-size: var(--step-1);
+  color: var(--text-2);
+  margin: 1.1rem 0 0;
+  line-height: 1.5;
+}
+.prose h2 {
+  font-size: var(--step-2);
+  margin: 3rem 0 0;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--border);
+  scroll-margin-top: 84px;
+}
+.prose h3 {
+  font-size: var(--step-1);
+  margin: 2rem 0 0;
+  scroll-margin-top: 84px;
+}
+.prose p {
+  margin: 1rem 0 0;
+  color: var(--text);
+  line-height: 1.7;
+}
+.prose p,
+.prose li {
+  color: var(--text);
+}
+.prose a:not(.btn) {
+  color: var(--accent-text);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklch, var(--accent) 40%, transparent);
+  transition: border-color 0.15s;
+}
+.prose a:not(.btn):hover {
+  border-bottom-color: var(--accent);
+}
+.prose ul,
+.prose ol {
+  margin: 1rem 0 0;
+  padding-left: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.prose ul > li {
+  position: relative;
+  padding-left: 1.4rem;
+  line-height: 1.65;
+}
+.prose ul > li::before {
+  content: "";
+  position: absolute;
+  left: 0.2rem;
+  top: 0.62em;
+  width: 6px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+.prose ol {
+  counter-reset: li;
+}
+.prose ol > li {
+  position: relative;
+  padding-left: 1.9rem;
+  line-height: 1.65;
+  counter-increment: li;
+}
+.prose ol > li::before {
+  content: counter(li);
+  position: absolute;
+  left: 0;
+  top: 0.05em;
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 6px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  display: grid;
+  place-items: center;
+}
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 0.1em 0.4em;
+  color: var(--accent-text);
+}
+
+/* ---------- code block ---------- */
+.code-block {
+  margin: 1.4rem 0 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #262f42;
+  background: #0a0e14;
+}
+/* numbered steps indent their text for the number badge (.prose ol > li
+   padding-left), but a code block shouldn't inherit that indent — it needs
+   to line up flush with callouts, which sit outside the <ol> at full width. */
+.prose ol > li .code-block,
+.prose ol > li .code-tabs {
+  margin-left: -1.9rem;
+}
+.code-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.85rem;
+  border-bottom: 1px solid #232c3d;
+  /* header used to be #0e141d — only 2-3 hex units off the body's
+     #0c1118, so the "titlebar" barely read as a separate region. Step it
+     up clearly instead of leaving header and body nearly indistinguishable. */
+  background: #151d2b;
+}
+.code-head .fname {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: #8794a8;
+}
+.code-head .lang {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: #4d5666;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.code-block pre {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+}
+.code-block code {
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  line-height: 1.8;
+  color: #c6d2e2;
+  background: none;
+  border: 0;
+  padding: 0;
+  display: block;
+  white-space: pre;
+}
+.code-block .pr {
+  color: var(--code-accent);
+}
+.code-block .fl {
+  color: var(--code-accent-2);
+}
+.code-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: #9aa7bc;
+  background: #1c273a;
+  border: 1px solid #2e3a52;
+  border-radius: 7px;
+  padding: 0.3rem 0.55rem;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.code-copy:hover {
+  color: #eaf0f8;
+  background: #24314a;
+  border-color: #3c4b68;
+}
+.code-copy.copied {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.code-copy svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* tabbed code (online/offline) */
+.code-tabs {
+  margin: 1.4rem 0 0;
+}
+.ct-bar {
+  display: flex;
+  gap: 0.2rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  padding: 0.3rem 0.3rem 0;
+}
+.ct-tab {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--text-2);
+  padding: 0.45rem 0.9rem;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.ct-tab.active {
+  color: var(--accent-text);
+  border-bottom-color: var(--accent);
+  background: var(--surface);
+}
+.code-tabs .code-block {
+  margin: 0;
+  border-radius: 0 0 12px 12px;
+  border-top: 0;
+}
+.ct-panel {
+  display: none;
+}
+.ct-panel.active {
+  display: block;
+}
+
+/* ---------- callouts ---------- */
+.callout {
+  margin: 1.5rem 0 0;
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: 10px;
+  padding: 0.95rem 1.1rem;
+  display: flex;
+  gap: 0.8rem;
+  background: var(--surface);
+}
+.callout .ic {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 0.1rem;
+}
+.callout .ic svg {
+  width: 20px;
+  height: 20px;
+}
+.callout .ct-body {
+  font-size: var(--step--1);
+  line-height: 1.6;
+}
+/* colour comes from each .callout.TYPE's own accent (below) — this is
+   just the fallback for a plain, un-typed .callout. */
+.callout .ct-body strong {
+  font-weight: 600;
+  color: var(--text);
+}
+.callout p {
+  margin: 0;
+}
+/* .note/.warn mixed their tint into var(--surface) — a solid, opaque
+   colour — instead of transparent the way .tip's own --accent-soft does.
+   Mixing into an opaque neutral averages toward that neutral's flat grey
+   rather than reading as a wash of colour over the page, which is duller
+   in light mode and (for .warn, before the oklab fix above) more exposed
+   to hue-interpolation drift. Matching .tip's transparent-based approach
+   is both more consistent and more "universal" — it rides on whatever's
+   behind it instead of needing to know var(--surface)'s exact colour. */
+.callout.note {
+  border-left-color: var(--note);
+  background: color-mix(in oklch, var(--note) 8%, transparent);
+}
+.callout.note .ic {
+  color: var(--note);
+}
+.callout.note .ct-body strong {
+  color: var(--note);
+}
+.callout.tip {
+  border-left-color: var(--accent);
+  background: var(--accent-soft);
+}
+.callout.tip .ic {
+  color: var(--accent-text);
+}
+.callout.tip .ct-body strong {
+  color: var(--accent-text);
+}
+.callout.warn {
+  border-left-color: var(--warn);
+  /* oklab, not oklch — mixing --warn (orange, hue 62) with anything
+     hued via oklch's default shorter-hue interpolation can swing through
+     unrelated hues (confirmed by rendering: it produced navy here before
+     this was transparent, and plain purple for .faq.faq-warn's border
+     mix against var(--border) — see that rule for the full explanation).
+     oklab has no hue angle to wrap the wrong way around. */
+  background: color-mix(in oklab, var(--warn) 10%, transparent);
+}
+.callout.warn .ic {
+  color: var(--warn);
+}
+.callout.warn .ct-body strong {
+  color: var(--warn);
+}
+
+/* ---------- tables ---------- */
+/* Self-contained: scoped to .table-wrap, not .prose, so the copied markup is
+   portable and renders identically outside a prose container. */
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.table-wrap table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: var(--step--1);
+}
+.table-wrap th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+}
+.table-wrap td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-2);
+  vertical-align: top;
+}
+.table-wrap tr:last-child td {
+  border-bottom: 0;
+}
+.table-wrap td code {
+  font-size: 0.82em;
+}
+/* prose-only rhythm */
+.prose .table-wrap {
+  margin: 1.4rem 0 0;
+}
+
+/* ---------- next steps + pager ---------- */
+
+.pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+.pager a {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem 1.1rem;
+  color: var(--text);
+  transition: border-color 0.2s;
+}
+.pager a:hover {
+  border-color: var(--accent);
+}
+.pager a.next {
+  text-align: right;
+  align-items: flex-end;
+}
+.pager .pg-k {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-3);
+}
+.pager .pg-t {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--accent-text);
+}
+/* live reading-progress ring + readout, filled by docs.js */
+.toc-gauge {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.toc-gauge.cheer {
+  animation: toc-gauge-cheer 0.7s ease;
+}
+@keyframes toc-gauge-cheer {
+  0%, 100% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.18);
+  }
+}
+.toc-ring {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: conic-gradient(var(--accent) calc(var(--p, 0) * 1%), var(--border) 0);
+  -webkit-mask: radial-gradient(circle, transparent 4px, #000 4.5px);
+  mask: radial-gradient(circle, transparent 4px, #000 4.5px);
+}
+.toc-pct {
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-text);
+  letter-spacing: 0.04em;
+}
+/* reading-progress fill: overlays the dim rail up to the scroll position */
+.toc-fill {
+  position: absolute;
+  left: -1.5px;
+  top: 0;
+  width: 1.5px;
+  height: 0;
+  border-radius: 2px;
+  background: var(--gradient-btn);
+  box-shadow: 0 0 8px var(--accent-glow);
+  transition: height 0.12s linear;
+  pointer-events: none;
+}
+/* playhead: a small brand cube riding the fill front */
+.toc-head {
+  position: absolute;
+  left: -1.5px;
+  top: 0;
+  width: 11px;
+  height: 11px;
+  margin: -5.5px 0 0 -5.5px;
+  border-radius: 2px;
+  background: var(--gradient-btn);
+  box-shadow: 0 0 0 3px var(--bg), 0 0 12px var(--accent-glow);
+  transform: rotate(45deg);
+  transition: top 0.12s linear;
+  pointer-events: none;
+  z-index: 2;
+}
+/* comet trail streaming up behind the descending playhead */
+.toc-head::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: 2px;
+  height: 26px;
+  transform: translateX(-50%);
+  background: linear-gradient(to top, var(--accent), transparent);
+  opacity: 0.55;
+  border-radius: 2px;
+}
+.toc-head.cheer {
+  animation: toc-cheer 0.7s cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+@keyframes toc-cheer {
+  0% {
+    transform: rotate(45deg) scale(1);
+  }
+  45% {
+    transform: rotate(225deg) scale(1.8);
+  }
+  100% {
+    transform: rotate(405deg) scale(1);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .toc-head {
+    animation: toc-head-spin 6s linear infinite;
+  }
+}
+@keyframes toc-head-spin {
+  to {
+    transform: rotate(405deg);
+  }
+}
+/* spark burst thrown off a node the instant it is passed */
+.toc-spark {
+  position: absolute;
+  left: -3px;
+  top: 0.95em;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+  z-index: 3;
+}
+.toc-spark i {
+  position: absolute;
+  left: -2px;
+  top: -2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0;
+  animation: toc-spark 0.55s ease-out forwards;
+}
+.toc-spark i:nth-child(1) { --tx: 11px; --ty: -7px; }
+.toc-spark i:nth-child(2) { --tx: 13px; --ty: 4px; }
+.toc-spark i:nth-child(3) { --tx: 8px; --ty: 10px; }
+.toc-spark i:nth-child(4) { --tx: -6px; --ty: -9px; }
+.toc-spark i:nth-child(5) { --tx: 14px; --ty: -1px; }
+.toc-spark i:nth-child(6) { --tx: 4px; --ty: -12px; }
+@keyframes toc-spark {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx), var(--ty)) scale(0.3);
+  }
+}
+/* one-shot pop the moment a node is passed */
+/* the current section's node breathes */
+
+/* ---------- get started: stepper ---------- */
+.step {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1.3rem;
+  position: relative;
+}
+/* a highlighted variant for the one repo card that's meant to draw the eye
+   inside the Get Started flow (e.g. iQ-Foundry under Model Deploy) — same
+   component, just dressed up: gradient tint, an icon chip instead of a bare
+   glyph, and an outbound arrow so it doesn't read as just another local step */
+/* a soft breathing glow, not a moving light — same --accent-glow token and
+   pulse rhythm as the "live" dot on the demo panel (.out-dev .dot), just
+   scaled up to a card-sized outer shadow instead of a tiny ring */
+
+/* a file-system path called out on its own line — lighter than
+   .code-block (no dark terminal chrome) since it's something to look at
+   while navigating folders, not a command to run — but still copyable,
+   so it reuses .code-copy/data-copy rather than inventing a new button. */
+.path-chip {
+  display: flex; align-items: center; gap: 0.7rem;
+  margin: 0.9rem 0 0; padding: 0.55rem 0.6rem 0.55rem 0.9rem;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--surface-2);
+  max-width: 100%;
+}
+.path-chip svg:first-child { flex: none; width: 16px; height: 16px; color: var(--text-3); }
+.path-chip code {
+  flex: 1; min-width: 0; overflow-x: auto;
+  font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-2);
+  background: none; border: 0; padding: 0; white-space: pre;
+}
+/* .code-copy's default colours are tuned for .code-head's fixed dark
+   terminal bar, which stays dark in both themes — this chip uses the
+   page's own (theme-aware) --surface-2, so the button needs to follow it
+   here instead of carrying its own hardcoded dark navy. */
+.path-chip .code-copy {
+  flex: none; color: var(--text-2); background: var(--surface); border-color: var(--border);
+}
+.path-chip .code-copy:hover { color: var(--text); background: var(--surface); border-color: var(--border-strong); }
+
+/* doc figures (real repo imagery) */
+.fig {
+  margin: 1.5rem 0 0;
+}
+.fig img {
+  width: 100%;
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+.fig figcaption {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--text-3);
+  margin-top: 0.55rem;
+  text-align: center;
+}
+.fig video {
+  width: 100%;
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #000;
+}
+.fig-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.fig-2 figure {
+  margin: 0;
+}
+@media (max-width: 680px) {
+  .fig-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- get-started: guided decision flow ---------- */
+
+.choice {
+  position: relative;
+  text-align: left;
+  background: var(--surface-grad);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  transition: border-color 0.2s, transform 0.2s var(--ease), background 0.2s, box-shadow 0.2s;
+}
+.choice:hover {
+  border-color: transparent;
+  transform: translateY(-3px);
+  background: linear-gradient(var(--surface), var(--surface)) padding-box, var(--gradient-border) border-box;
+  box-shadow: 0 14px 44px var(--accent-glow);
+}
+.choice h3 {
+  font-size: 1.15rem;
+}

@@ -1,0 +1,2060 @@
+/* ============================================================
+   iQ-Studio — design tokens + page styles
+   Type: Work Sans Variable for both headings and body/UI text, Space Mono
+   (code), with Noto Sans TC Variable as the CJK fallback. All self-hosted
+   via npm (@fontsource-variable/work-sans, @fontsource/space-mono,
+   @fontsource-variable/noto-sans-tc) — none loaded from a Google CDN.
+   Dark/light dual mode.
+   ============================================================ */
+
+/* Self-hosted @font-face declarations (see assets/fonts/fonts.css). Kept as
+   a separate file rather than pasted inline so `npm install` + re-copy is
+   the whole update path. */
+@import url("assets/fonts/fonts.css");
+
+/* ---- tokens ---- */
+:root {
+  /* Work Sans carries both headings and body/UI text — self-hosted, backed
+     by Noto Sans TC Variable for any CJK glyph it doesn't cover. Space Mono
+     is the code/mono face. See the @import above; none of these load from
+     a Google CDN. */
+  --font-display: "Work Sans Variable", "Noto Sans TC Variable", "Arial Narrow", "Helvetica Neue Condensed", "Liberation Sans Narrow", "Roboto Condensed", Arial, sans-serif;
+  --font-ui: "Work Sans Variable", "Noto Sans TC Variable", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Roboto, ui-sans-serif, sans-serif;
+  --font-mono: "Space Mono", "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  /* Segoe UI weight ramp */
+  --fw-regular: 400;
+  --fw-semibold: 600;
+  /* ---- brand palette -------------------------------------------------
+     Hue is taken from the Innodisk corporate palette and is NEVER altered.
+     Only lightness (--l1/--l2) and chroma (--c1/--c2) adapt per theme, so
+     the same brand colour stays legible on both backgrounds.
+     Switch the whole site with one attribute:  <html data-palette="orange">
+     The official brand gradient pairs drive --brand-1 -> --brand-2.
+     -------------------------------------------------------------------- */
+  --h1: 263.5;  /* Innodisk Blue        #0048FF */
+  --h2: 237.4;  /* Innodisk Light Blue  #00B4FF */
+  /* fallbacks, in case a theme/palette pair has not been resolved yet */
+  --l1: 0.700;
+  --c1: 0.150;
+  --l2: 0.800;
+  --c2: 0.110;
+
+  --brand-1: oklch(var(--l1) var(--c1) var(--h1));
+  --brand-2: oklch(var(--l2) var(--c2) var(--h2));
+  /* Tertiary: sits past stop 2 on the same ramp — used for large soft washes
+     and the third band of multi-stop gradients. Derived from the pair, so no
+     palette needs to declare it. */
+  --brand-3: oklch(var(--l3, calc(var(--l2) + 0.10)) calc(var(--c2) * 0.55) var(--h2));
+  --accent: var(--brand-1);
+  --accent-soft: color-mix(in oklch, var(--accent) 16%, transparent);
+  --accent-glow: color-mix(in oklch, var(--accent) 28%, transparent);
+
+  /* Every gradient derives from the brand pair — declared once here, so a
+     palette switch needs no gradient edits anywhere. */
+  /* The button gradient stops short of --brand-2 so one text colour stays
+     legible across the whole fill; display type uses the full pair. */
+  --gradient-btn: linear-gradient(135deg, var(--brand-1) 0%, color-mix(in oklch, var(--brand-2) calc(var(--btn-span, 0.45) * 100%), var(--brand-1)) 100%);
+  /* display type sits on the page background, so it uses its own darkened
+     stops (--gl1/--gl2) rather than the fill colours */
+  --grad-text-1: oklch(var(--gl1, var(--l1)) var(--c1) var(--h1));
+  --grad-text-2: oklch(var(--gl2, var(--l2)) var(--c2) var(--h2));
+  --gradient-text: linear-gradient(100deg, var(--grad-text-1) 0%, var(--grad-text-2) 100%);
+  --gradient-border: var(--gradient-text);
+  --gradient-soft: linear-gradient(135deg, color-mix(in oklch, var(--brand-1) 20%, transparent), color-mix(in oklch, var(--brand-2) 20%, transparent) 60%, color-mix(in oklch, var(--brand-3) 16%, transparent));
+  --surface-grad: linear-gradient(160deg, color-mix(in oklch, var(--brand-1) 6%, var(--surface)), var(--surface) 55%, color-mix(in oklch, var(--brand-2) 8%, var(--surface)));
+  /* code and terminal panels keep a dark surface in both themes, so they
+     need an accent tuned for dark backgrounds regardless of --l1 */
+  --code-accent: oklch(0.78 max(var(--c1), 0.10) var(--h1));
+  --code-accent-2: oklch(0.72 max(var(--c2), 0.09) var(--h2));
+
+  /* Semantic colours are FIXED across palettes: they carry meaning, not
+     brand. Tying them to the accent would destroy the signal. */
+  --danger: #EB1B23;   /* Innodisk Red */
+  --success: #1a8f6e;
+  --maxw: 1200px;
+  --radius: 14px;
+  --radius-lg: 22px;
+  /* fluid type scale */ --step--1: clamp(0.9375rem, 0.91rem + 0.12vw, 1.025rem);
+  --step-0:  clamp(1.125rem, 1.08rem + 0.22vw, 1.25rem);
+  --step-1:  clamp(1.2rem, 1.1rem + 0.5vw, 1.4rem);
+  --step-2:  clamp(1.5rem, 1.3rem + 1vw, 2rem);
+  --step-3:  clamp(2rem, 1.6rem + 2vw, 3rem);
+  --step-4:  clamp(2.6rem, 1.9rem + 3.4vw, 4.6rem);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---- palettes -------------------------------------------------------
+   Each entry is an official Innodisk gradient pair. Hue (--h1/--h2) is
+   converted straight from the corporate hex codes and is NEVER altered.
+   Lightness (--l1/--l2) and chroma (--c1/--c2) are set per theme below,
+   because a colour that reads on near-white will not read on near-black.
+   Chroma is also capped to what sRGB can actually hold at that lightness,
+   so nothing silently clips.
+   Switch the whole site with one attribute:  <html data-palette="orange">
+   -------------------------------------------------------------------- */
+/* Hue is converted straight from the corporate hex codes and NEVER altered. */
+[data-palette="blue"] {
+  --h1: 263.5;  /* Innodisk Blue        #0048FF */
+  --h2: 237.4;  /* Innodisk Light Blue  #00B4FF */
+}
+[data-palette="ltblue"] {
+  --h1: 237.4;  /* Innodisk Light Blue  #00B4FF */
+  --h2: 237.4;
+}
+[data-palette="orange"] {
+  --h1: 44.4;   /* Innodisk Orange      #FF6900 */
+  --h2: 84.4;   /* Innodisk Yellow      #FABE23 */
+}
+[data-palette="yellow"] {
+  --h1: 84.4;   /* Innodisk Yellow      #FABE23 */
+  --h2: 84.4;
+}
+[data-palette="magenta"] {
+  --h1: 351.8;  /* Innodisk Magenta     #BE0078 */
+  --h2: 328.4;  /* Innodisk Pink        #FF00FF */
+}
+[data-palette="pink"] {
+  --h1: 328.4;  /* Innodisk Pink        #FF00FF */
+  --h2: 328.4;
+}
+[data-palette="green"] {
+  --h1: 142.5;  /* Innodisk Green       #007800 */
+  --h2: 142.5;  /* Innodisk Light Green #00DC00 — same hue, so the pair is a lightness ramp */
+}
+[data-palette="ltgreen"] {
+  --h1: 142.5;  /* Innodisk Light Green #00DC00 */
+  --h2: 142.5;
+}
+[data-palette="violet"] {
+  --h1: 295.0;  /* Lavender  #B69CF5 — the original iQ-Studio accent */
+  --h2: 340.0;  /* Pink      #F8A5D8 */
+}
+[data-palette="mono"] {
+  --h1: 0;      /* Black-White gradient — neutral, no hue */
+  --h2: 0;
+}
+
+/* Light theme: each palette sits at the deepest lightness its hue allows
+   while white button text still clears 4.5:1. Chroma is the sRGB ceiling at
+   that lightness, so nothing clips. */
+[data-theme="light"][data-palette="blue"] { --l1: 0.513; --c1: 0.266; --l2: 0.73; --c2: 0.154; --on-accent: #ffffff; --btn-span: 0.15; --gl1: 0.42; --gl2: 0.5; }
+[data-theme="light"][data-palette="ltblue"] { --l1: 0.73; --c1: 0.154; --l2: 0.8; --c2: 0.11; --on-accent: oklch(0.16 0.02 var(--h1)); --btn-span: 0.55; --gl1: 0.42; --gl2: 0.5; }
+[data-theme="light"][data-palette="orange"] { --l1: 0.7; --c1: 0.196; --l2: 0.834; --c2: 0.164; --on-accent: oklch(0.16 0.02 var(--h1)); --btn-span: 0.55; --gl1: 0.42; --gl2: 0.5; }
+[data-theme="light"][data-palette="yellow"] { --l1: 0.834; --c1: 0.164; --l2: 0.8; --c2: 0.158; --on-accent: oklch(0.16 0.02 var(--h1)); --btn-span: 0.55; --gl1: 0.42; --gl2: 0.5; }
+[data-theme="light"][data-palette="magenta"] { --l1: 0.526; --c1: 0.216; --l2: 0.702; --c2: 0.318; --on-accent: #ffffff; --btn-span: 0.35; --gl1: 0.42; --gl2: 0.5; }
+[data-theme="light"][data-palette="pink"] { --l1: 0.702; --c1: 0.318; --l2: 0.8; --c2: 0.188; --on-accent: oklch(0.16 0.02 var(--h1)); --btn-span: 0.55; --gl1: 0.42; --gl2: 0.5; }
+[data-theme="light"][data-palette="green"] { --l1: 0.496; --c1: 0.168; --l2: 0.775; --c2: 0.26; --on-accent: #ffffff; --btn-span: 0.05; --gl1: 0.42; --gl2: 0.5; }
+[data-theme="light"][data-palette="ltgreen"] { --l1: 0.74; --c1: 0.10; --l2: 0.88; --c2: 0.07; --on-accent: oklch(0.16 0.02 var(--h1)); --btn-span: 0.55; --gl1: 0.42; --gl2: 0.5; }
+[data-theme="light"][data-palette="violet"]  { --l1: 0.500; --c1: 0.220; --l2: 0.640; --c2: 0.190; --on-accent: #ffffff; --btn-span: 0.35; --gl1: 0.42; --gl2: 0.50; }
+[data-theme="light"][data-palette="mono"]    { --l1: 0.320; --c1: 0.000; --l2: 0.480; --c2: 0.000; --on-accent: #ffffff; --btn-span: 0.55; --gl1: 0.32; --gl2: 0.46; }
+
+/* Dark theme: dim brand colours are lifted so they read on near-black; the
+   already-light ones keep their official value. */
+[data-theme="dark"][data-palette="blue"] { --l1: 0.7; --c1: 0.15; --l2: 0.8; --c2: 0.11; --on-accent: oklch(0.16 0.02 var(--h1)); --btn-span: 0.55; --gl1: 0.7; --gl2: 0.8; }
+[data-theme="dark"][data-palette="ltblue"] { --l1: 0.73; --c1: 0.154; --l2: 0.86; --c2: 0.072; --on-accent: oklch(0.16 0.02 var(--h1)); --btn-span: 0.55; --gl1: 0.73; --gl2: 0.86; }
+[data-theme="dark"][data-palette="orange"] { --l1: 0.7; --c1: 0.196; --l2: 0.834; --c2: 0.164; --on-accent: oklch(0.16 0.02 var(--h1)); --btn-span: 0.55; --gl1: 0.7; --gl2: 0.83; }
+[data-theme="dark"][data-palette="yellow"] { --l1: 0.834; --c1: 0.164; --l2: 0.93; --c2: 0.068; --on-accent: oklch(0.16 0.02 var(--h1)); --btn-span: 0.55; --gl1: 0.83; --gl2: 0.93; }
+[data-theme="dark"][data-palette="magenta"] { --l1: 0.7; --c1: 0.218; --l2: 0.8; --c2: 0.188; --on-accent: oklch(0.16 0.02 var(--h1)); --btn-span: 0.55; --gl1: 0.7; --gl2: 0.8; }
+[data-theme="dark"][data-palette="pink"] { --l1: 0.702; --c1: 0.318; --l2: 0.832; --c2: 0.152; --on-accent: oklch(0.16 0.02 var(--h1)); --btn-span: 0.55; --gl1: 0.7; --gl2: 0.83; }
+[data-theme="dark"][data-palette="green"] { --l1: 0.7; --c1: 0.169; --l2: 0.8; --c2: 0.264; --on-accent: oklch(0.16 0.02 var(--h1)); --btn-span: 0.55; --gl1: 0.7; --gl2: 0.8; }
+[data-theme="dark"][data-palette="ltgreen"] { --l1: 0.8; --c1: 0.10; --l2: 0.9; --c2: 0.07; --on-accent: oklch(0.16 0.02 var(--h1)); --btn-span: 0.55; --gl1: 0.8; --gl2: 0.9; }
+[data-theme="dark"][data-palette="violet"]  { --l1: 0.740; --c1: 0.150; --l2: 0.830; --c2: 0.130; --on-accent: oklch(0.16 0.02 var(--h1)); --btn-span: 0.55; --gl1: 0.74; --gl2: 0.83; }
+[data-theme="dark"][data-palette="mono"]    { --l1: 0.880; --c1: 0.000; --l2: 0.980; --c2: 0.000; --on-accent: oklch(0.16 0.02 var(--h1)); --btn-span: 0.55; --gl1: 0.88; --gl2: 0.98; }
+
+[data-theme="light"] {
+  /* tells the browser to paint scrollbars, select popups and other native
+     controls in the matching scheme */
+  color-scheme: light;
+  --accent-deep: oklch(0.42 calc(var(--c1) * 0.9) var(--h1));
+  --accent-text: var(--accent-deep);
+  /* neutrals keep their exact lightness and pick up the palette hue at very
+     low chroma, so the greys never fight the accent */
+  --bg: oklch(0.985 0.004 var(--h1));
+  --bg-2: oklch(0.962 0.010 var(--h1));
+  --surface: #ffffff;
+  --surface-2: oklch(0.925 0.016 var(--h1));
+  --border: oklch(0.884 0.018 var(--h1));
+  --border-strong: oklch(0.822 0.026 var(--h1));
+  --text: oklch(0.232 0.028 var(--h1));
+  --text-2: oklch(0.478 0.034 var(--h1));
+  --text-3: oklch(0.648 0.026 var(--h1));
+  --shadow: 0 1px 2px rgba(28,21,48,0.06), 0 14px 40px rgba(28,21,48,0.10);
+  --grid-line: color-mix(in oklch, var(--brand-1) 8%, transparent);
+  /* the base --accent-soft (16% mix, styles.css root) reads noticeably
+     heavier here than in dark theme, because light theme's --accent itself
+     is tuned darker/more saturated (see the [data-theme="light"][data-palette=...]
+     blocks below) — the same 16% of a bolder colour is a bolder tint.
+     Light-only override, dark keeps the base 16%. */
+  --accent-soft: color-mix(in oklch, var(--accent) 8%, transparent);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --accent-deep: oklch(0.60 var(--c1) var(--h1));
+  --accent-text: var(--accent);
+  --bg: oklch(0.1 0.014 var(--h1));
+  --bg-2: oklch(0.196 0.016 var(--h1));
+  --surface: oklch(0.235 0.018 var(--h1));
+  --surface-2: oklch(0.270 0.024 var(--h1));
+  --border: oklch(0.310 0.028 var(--h1));
+  --border-strong: oklch(0.380 0.032 var(--h1));
+  --text: oklch(0.930 0.008 var(--h1));
+  --text-2: oklch(0.652 0.028 var(--h1));
+  --text-3: oklch(0.462 0.028 var(--h1));
+  --success: #7ee0c5;
+  --danger: oklch(0.70 0.19 27.5);
+  --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 18px 50px rgba(0,0,0,0.5);
+  --grid-line: color-mix(in oklch, var(--brand-1) 8%, transparent);
+}
+
+/* font swap via Tweaks. "corp" is the default and lives on :root, so it needs
+   no rule here — these are the alternates. */
+[data-font="segoe"] {
+  --font-display: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* ---- cube cursor --------------------------------------------------------
+   Replace the pointer with the brand cube, coloured to the active palette
+   (mono / anything unmapped falls back to white). Interactive elements keep
+   the system pointer so clickability is never lost; text fields keep the I-beam.
+   -------------------------------------------------------------------- */
+:root {
+  cursor: url("assets/cursor-cube-white.png") 6 6, default;
+}
+[data-palette="blue"]    { cursor: url("assets/cursor-cube-blue.png") 6 6, default; }
+[data-palette="ltblue"]  { cursor: url("assets/cursor-cube-ltblue.png") 6 6, default; }
+[data-palette="orange"]  { cursor: url("assets/cursor-cube-orange.png") 6 6, default; }
+[data-palette="yellow"]  { cursor: url("assets/cursor-cube-yellow.png") 6 6, default; }
+[data-palette="magenta"] { cursor: url("assets/cursor-cube-magenta.png") 6 6, default; }
+[data-palette="pink"]    { cursor: url("assets/cursor-cube-pink.png") 6 6, default; }
+[data-palette="green"]   { cursor: url("assets/cursor-cube-green.png") 6 6, default; }
+[data-palette="ltgreen"] { cursor: url("assets/cursor-cube-green.png") 6 6, default; }
+[data-palette="violet"]  { cursor: url("assets/cursor-cube-violet.png") 6 6, default; }
+a,
+button,
+summary,
+label,
+[role="tab"],
+[role="button"],
+.btn,
+[onclick] {
+  cursor: pointer;
+}
+input, textarea, [contenteditable="true"] {
+  cursor: text;
+}
+
+/* ---- scrollbars ---------------------------------------------------------
+   Thin, palette-tinted, and quiet: the thumb is a low-chroma grey drawn from
+   the active hue so it never fights the accent, and it darkens on hover. Both
+   the Firefox (scrollbar-*) and WebKit (::-webkit-scrollbar) syntaxes so it
+   reads the same across browsers.
+   -------------------------------------------------------------------- */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) transparent;
+  /* the viewport measures against html, not body — a few stray pixels
+     anywhere on the page (rounding in a min(100% - Nrem, ...) width, a
+     full-bleed decorative layer, etc.) can let the whole page pan sideways
+     and reveal empty space past the real content, so this is the one that
+     actually needs to carry overflow-x:hidden. body deliberately does NOT
+     also set it — that combination is a known trigger for position:sticky
+     silently failing on body's descendants (see body's own rule). */
+  overflow-x: hidden;
+}
+:root {
+  --scroll-thumb: oklch(0.62 0.02 var(--h1) / 0.4);
+  --scroll-thumb-hover: oklch(0.62 0.03 var(--h1) / 0.65);
+}
+[data-theme="light"] {
+  --scroll-thumb: oklch(0.55 0.02 var(--h1) / 0.35);
+  --scroll-thumb-hover: oklch(0.45 0.03 var(--h1) / 0.6);
+}
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scroll-thumb-hover);
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-weight: var(--fw-regular);
+  background: var(--bg);
+  color: var(--text);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background 0.4s var(--ease), color 0.4s var(--ease);
+  /* not overflow-x:hidden here too — html already clips horizontal pan
+     (see its own rule above), and having it on BOTH html and body is a
+     known Chrome/Firefox trigger for position:sticky silently failing on
+     body's descendants, which is exactly what was breaking .site-header. */
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+img {
+  max-width: 100%;
+  display: block;
+}
+
+.wrap {
+  width: min(100% - 3rem, var(--maxw));
+  margin-inline: auto;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+  font-weight: 500;
+}
+.eyebrow::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--gradient-btn);
+  box-shadow: 0 0 12px var(--accent);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: -0.005em;
+  margin: 0;
+  text-wrap: balance;
+}
+h2.section-title {
+  font-size: var(--step-3);
+}
+p {
+  text-wrap: pretty;
+}
+
+/* ---- buttons ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  font-family: var(--font-ui);
+  font-weight: var(--fw-semibold);
+  font-size: var(--step-0);
+  padding: 0.72em 1.25em;
+  border-radius: 11px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.18s var(--ease), background 0.2s, border-color 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn-primary {
+  background: var(--gradient-btn);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+.btn-primary:hover:not(:disabled):not([aria-disabled="true"]) {
+  box-shadow: 0 0 0 4px var(--accent-soft), 0 8px 24px var(--accent-glow, transparent);
+}
+.btn-primary:active:not(:disabled) {
+  filter: brightness(0.94);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+/* ---- interaction states ----------------------------------------
+   Applies to every interactive component. Disabled wins over hover
+   and pressed; focus-visible is keyboard-only so pointer users never
+   see the ring. Never remove the ring without replacing it.
+   ------------------------------------------------------------- */
+:root {
+  --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+}
+
+/* Shared disabled treatment. pointer-events is applied only to
+   [aria-disabled] elements — native :disabled already blocks activation, and
+   pointer-events:none would suppress the not-allowed cursor there. */
+.btn:disabled,
+.btn[aria-disabled="true"],
+.icon-btn:disabled,
+.copy-btn:disabled,
+.code-copy:disabled,
+.ct-tab:disabled,
+.term-tab:disabled,
+.choice:disabled,
+.layer:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+  filter: grayscale(0.35);
+}
+/* non-form controls have no native blocking, so stop pointer input outright */
+[aria-disabled="true"] {
+  pointer-events: none;
+}
+/* disabled primaries drop the gradient so they read as inert, not brand */
+.btn-primary:disabled,
+.btn-primary[aria-disabled="true"] {
+  background: var(--surface-2);
+  color: var(--text-3);
+  border-color: var(--border);
+  filter: none;
+}
+
+/* keyboard focus — visible ring on every focusable control */
+.btn:focus-visible,
+.icon-btn:focus-visible,
+.copy-btn:focus-visible,
+.code-copy:focus-visible,
+.ct-tab:focus-visible,
+.term-tab:focus-visible,
+.choice:focus-visible,
+.layer:focus-visible,
+a:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: 9px;
+}
+/* pressed feedback for non-.btn controls */
+.icon-btn:active:not(:disabled),
+.copy-btn:active:not(:disabled),
+.code-copy:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.choice:active:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn:active,
+.icon-btn:active,
+.copy-btn:active,
+.code-copy:active {
+    transform: none;
+  }
+}
+.btn .ico {
+  width: 1.05em;
+  height: 1.05em;
+}
+
+/* ---- header ---- */
+.site-header {
+  position: sticky;
+  top: clamp(0.5rem, 1.2vh, 0.9rem);
+  padding-block: 0.45rem;
+  z-index: 50;
+  background: color-mix(in oklch, var(--bg) 78%, transparent);
+  backdrop-filter: blur(14px) saturate(1.4);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s, background 0.3s;
+}
+.site-header.scrolled {
+  border-bottom-color: var(--border);
+}
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  height: 64px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+  margin-right: auto;
+  white-space: nowrap;
+}
+.brand .logo {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--gradient-btn);
+  color: var(--on-accent);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  font-family: var(--font-mono);
+  letter-spacing: -0.05em;
+  box-shadow: 0 0 0 1px color-mix(in oklch, var(--accent) 40%, transparent);
+}
+.brand .logo svg {
+  width: 17px;
+  height: 17px;
+}
+/* wraps .nav-links + .nav-tools so both collapse behind one hamburger on
+   mobile (see the max-width:980px block) instead of two separate targets */
+.nav-drawer {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+/* the drawer's own brand row only exists for the mobile off-canvas panel */
+.nav-drawer-head {
+  display: none;
+}
+.nav-links {
+  display: flex;
+  gap: 0.3rem;
+}
+.nav-links a {
+  color: var(--text-2);
+  font-size: 0.92rem;
+  font-weight: 450;
+  padding: 0.45rem 0.7rem;
+  border-radius: 8px;
+  transition: color 0.18s, background 0.18s;
+}
+.nav-links a:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+/* per-link icons only make sense in the collapsed mobile drawer; the
+   desktop inline nav row has always been text-only */
+.nl-ic {
+  display: none;
+}
+/* nav links to pages not yet deployed (opened day-of) — kept in the markup,
+   just non-interactive and visibly muted until the href is restored */
+.nav-links a.soon {
+  pointer-events: none;
+  cursor: not-allowed;
+  color: var(--text-3);
+}
+.nav-links a.soon .nl-soon-badge {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.05rem 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.02em;
+  color: var(--text-3);
+  vertical-align: 1px;
+}
+.nav-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+/* mobile trigger for .nav-links, which display:none hides below 980px —
+   without this the main site nav becomes completely unreachable on mobile */
+.nav-menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex: none;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-2);
+  cursor: pointer;
+}
+.nav-menu-btn svg {
+  width: 18px;
+  height: 18px;
+}
+.nav-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 75;
+}
+.nav-backdrop.open {
+  display: block;
+}
+.icon-btn {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: color 0.18s, border-color 0.18s, background 0.18s;
+}
+.icon-btn:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+/* only rendered as a visible row label inside the mobile drawer — desktop's
+   icon-only header row has no room for it */
+.nt-label {
+  display: none;
+}
+.icon-btn svg {
+  width: 18px;
+  height: 18px;
+}
+/* hover tooltip */
+.icon-btn[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  top: calc(100% + 9px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: var(--text);
+  color: var(--bg);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: var(--fw-semibold);
+  line-height: 1;
+  white-space: nowrap;
+  padding: 0.38rem 0.6rem;
+  border-radius: 7px;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: var(--shadow);
+  transition: opacity 0.16s var(--ease), transform 0.16s var(--ease);
+  z-index: 70;
+}
+.icon-btn[data-tip]::before {
+  content: "";
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  border: 5px solid transparent;
+  border-bottom-color: var(--text);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.16s var(--ease), transform 0.16s var(--ease);
+  z-index: 70;
+}
+.icon-btn[data-tip]:hover::after,
+.icon-btn[data-tip]:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ---- loading states ---------------------------------------------------
+   Three, by wait length. Under ~1s use nothing. 1–3s: spinner. Content
+   whose shape is known: skeleton. Known duration or step count: progress.
+   All palette-driven and all reduced-motion aware.
+   -------------------------------------------------------------------- */
+
+/* 1 — spinner: indeterminate, short waits.
+   Built from squares, not a ring — the 2x2 cell grid echoes the module/tile
+   language used by cards and the logo mark. One lit square travels the
+   corners over four faint ones; markup stays a single empty element. */
+
+/* 2 — skeleton: the shape is known, so show the shape */
+
+/* 3 — progress: determinate, or indeterminate when only "working" is known */
+.progress {
+  height: 6px;
+  width: 100%;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--surface-2);
+}
+.progress > .bar {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--gradient-btn);
+  transition: width 0.4s var(--ease);
+}
+
+   Lets any visitor switch the primary colour. Swatches show the official
+   brand pair so the choice reads as a gradient, not a flat colour.
+   -------------------------------------------------------------------- */
+.pal-picker {
+  position: relative;
+}
+.pal-trigger .pal-current {
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: var(--gradient-btn);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.18);
+}
+.pal-menu {
+  position: absolute;
+  top: calc(100% + 9px);
+  right: 0;
+  min-width: 186px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 0.4rem;
+  display: none;
+  z-index: 70;
+}
+.pal-picker.open .pal-menu {
+  display: block;
+}
+.pal-menu-h {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 0.35rem 0.55rem 0.45rem;
+}
+.pal-menu button {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  font-family: var(--font-ui);
+  font-size: 0.86rem;
+  font-weight: 450;
+  color: var(--text-2);
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  padding: 0.45rem 0.55rem;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.15s, background 0.15s;
+}
+.pal-menu button:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+.pal-menu button .tick {
+  width: 14px;
+  height: 14px;
+  margin-left: auto;
+  color: var(--accent-text);
+  opacity: 0;
+}
+.pal-menu button[aria-current="true"] {
+  color: var(--text);
+}
+.pal-menu button[aria-current="true"] .tick {
+  opacity: 1;
+}
+.pal-menu .sw-dot,
+.pal-switch .sw-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  flex: none;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15);
+}
+/* swatch fills mirror the official gradient pairs regardless of the palette
+   currently applied, so the menu always previews all four */
+.sw-dot[data-p="blue"] {
+  background: linear-gradient(135deg, #0048FF, #00B4FF);
+}
+.sw-dot[data-p="orange"] {
+  background: linear-gradient(135deg, #FF6900, #FABE23);
+}
+.sw-dot[data-p="magenta"] {
+  background: linear-gradient(135deg, #BE0078, #FF00FF);
+}
+.sw-dot[data-p="green"] {
+  background: linear-gradient(135deg, #007800, #00DC00);
+}
+.sw-dot[data-p="ltgreen"] {
+  background: linear-gradient(135deg, #00DC00, #BEEFC2);
+}
+.sw-dot[data-p="ltblue"] {
+  background: linear-gradient(135deg, #00B4FF, #A5D9FB);
+}
+.sw-dot[data-p="yellow"] {
+  background: linear-gradient(135deg, #FABE23, #FDE1A9);
+}
+.sw-dot[data-p="pink"] {
+  background: linear-gradient(135deg, #FF00FF, #FDA3F9);
+}
+.sw-dot[data-p="violet"] {
+  background: linear-gradient(135deg, #B69CF5, #F8A5D8);
+}
+.sw-dot[data-p="mono"] {
+  background: linear-gradient(135deg, #000000, #FFFFFF);
+}
+.theme-toggle .sun {
+  display: none;
+}
+[data-theme="dark"] .theme-toggle .sun {
+  display: block;
+}
+[data-theme="dark"] .theme-toggle .moon {
+  display: none;
+}
+
+/* ---- page backdrop: isometric cube lattice -------------------------------
+   One fixed layer behind every page. An SVG tile is masked rather than
+   stroked so the line colour is set via background-color (--grid-line) rather
+   than a baked-in data-URI stroke. --grid-line mixes in the active palette's
+   own brand colour (not a low-chroma neutral) so the coordination actually
+   reads at a glance — kept as a low-percentage mix (not a mask covering the
+   pattern) so it stays a backdrop, not a foreground colour block. Fades out
+   down the page so it never competes with content.
+   -------------------------------------------------------------------- */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background: var(--grid-line);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2255.426%22%20height%3D%2296%22%20viewBox%3D%220%200%2055.426%2096%22%3E%3Cpath%20d%3D%22M27.71%20-32L55.43%20-16L55.43%2016L27.71%2032L0%2016L0%20-16ZM27.71%200L27.71%20-32M27.71%200L55.43%2016M27.71%200L0%2016M0%2016L27.71%2032L27.71%2064L0%2080L-27.71%2064L-27.71%2032ZM0%2048L0%2016M0%2048L27.71%2064M0%2048L-27.71%2064M55.43%2016L83.14%2032L83.14%2064L55.43%2080L27.71%2064L27.71%2032ZM55.43%2048L55.43%2016M55.43%2048L83.14%2064M55.43%2048L27.71%2064M27.71%2064L55.43%2080L55.43%20112L27.71%20128L0%20112L0%2080ZM27.71%2096L27.71%2064M27.71%2096L55.43%20112M27.71%2096L0%20112%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221%22%2F%3E%3C%2Fsvg%3E"), linear-gradient(#000 0%, rgba(0,0,0,0.55) 45%, transparent 100%);
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2255.426%22%20height%3D%2296%22%20viewBox%3D%220%200%2055.426%2096%22%3E%3Cpath%20d%3D%22M27.71%20-32L55.43%20-16L55.43%2016L27.71%2032L0%2016L0%20-16ZM27.71%200L27.71%20-32M27.71%200L55.43%2016M27.71%200L0%2016M0%2016L27.71%2032L27.71%2064L0%2080L-27.71%2064L-27.71%2032ZM0%2048L0%2016M0%2048L27.71%2064M0%2048L-27.71%2064M55.43%2016L83.14%2032L83.14%2064L55.43%2080L27.71%2064L27.71%2032ZM55.43%2048L55.43%2016M55.43%2048L83.14%2064M55.43%2048L27.71%2064M27.71%2064L55.43%2080L55.43%20112L27.71%20128L0%20112L0%2080ZM27.71%2096L27.71%2064M27.71%2096L55.43%20112M27.71%2096L0%20112%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221%22%2F%3E%3C%2Fsvg%3E"), linear-gradient(#000 0%, rgba(0,0,0,0.55) 45%, transparent 100%);
+  -webkit-mask-size: 49.9px 86.4px, 100% 100%;
+  mask-size: 49.9px 86.4px, 100% 100%;
+  -webkit-mask-repeat: repeat, no-repeat;
+  mask-repeat: repeat, no-repeat;
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+@media (prefers-reduced-motion: no-preference) {
+  body::before {
+    transition: background-color 0.25s ease;
+  }
+}
+
+/* ---- hero cube ------------------------------------------------------------
+   A product-reveal loop rather than a moving object: eight shards converge, a
+   flash covers the handover, the whole cube settles, then its seams and core
+   light while a sweep passes over the silhouette. Every layer shares one
+   duration so the phases stay locked together no matter when the tab is shown.
+   Achromatic on purpose — only the theme swaps the render, never the palette.
+   -------------------------------------------------------------------- */
+.hero-cubes {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  /* the glows extend well past the artwork bounds; never clip them */
+  overflow: visible;
+}
+.hero-cubes[hidden] {
+  display: none;
+}
+.hc-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+:root[data-theme="dark"] {
+  --hc-lit: #ffffff;
+  --hc-shadow: #04060a;
+}
+:root[data-theme="light"] {
+  --hc-lit: #7b8794;
+  --hc-shadow: #b9c1c8;
+}
+@keyframes hc-bob {
+  0%, 100% {
+    transform: translateY(-7px);
+  }
+  50% {
+    transform: translateY(7px);
+  }
+}
+@keyframes hc-shard1 {
+  0% {
+    opacity: 0;
+    transform: translate(0px, 6px) scale(0.5);
+  }
+  4% {
+    opacity: 1;
+    transform: translate(0px, 6px) scale(0.5);
+  }
+  /* seated in the 2x2x2 formation, held so the group is legible */
+  15%, 18% {
+    opacity: 1;
+    transform: translate(0px, 4px) scale(0.5);
+  }
+  21%, 100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.5);
+  }
+}
+@keyframes hc-shard2 {
+  0% {
+    opacity: 0;
+    transform: translate(121px, 67px) scale(0.5);
+  }
+  4% {
+    opacity: 1;
+    transform: translate(121px, 67px) scale(0.5);
+  }
+  /* seated in the 2x2x2 formation, held so the group is legible */
+  15%, 18% {
+    opacity: 1;
+    transform: translate(78px, 43px) scale(0.5);
+  }
+  21%, 100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.5);
+  }
+}
+@keyframes hc-shard3 {
+  0% {
+    opacity: 0;
+    transform: translate(-121px, 67px) scale(0.5);
+  }
+  4% {
+    opacity: 1;
+    transform: translate(-121px, 67px) scale(0.5);
+  }
+  /* seated in the 2x2x2 formation, held so the group is legible */
+  15%, 18% {
+    opacity: 1;
+    transform: translate(-78px, 43px) scale(0.5);
+  }
+  21%, 100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.5);
+  }
+}
+@keyframes hc-shard4 {
+  0% {
+    opacity: 0;
+    transform: translate(0px, 127px) scale(0.5);
+  }
+  4% {
+    opacity: 1;
+    transform: translate(0px, 127px) scale(0.5);
+  }
+  /* seated in the 2x2x2 formation, held so the group is legible */
+  15%, 18% {
+    opacity: 1;
+    transform: translate(0px, 82px) scale(0.5);
+  }
+  21%, 100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.5);
+  }
+}
+@keyframes hc-shard5 {
+  0% {
+    opacity: 0;
+    transform: translate(0px, -127px) scale(0.5);
+  }
+  4% {
+    opacity: 1;
+    transform: translate(0px, -127px) scale(0.5);
+  }
+  /* seated in the 2x2x2 formation, held so the group is legible */
+  15%, 18% {
+    opacity: 1;
+    transform: translate(0px, -82px) scale(0.5);
+  }
+  21%, 100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.5);
+  }
+}
+@keyframes hc-shard6 {
+  0% {
+    opacity: 0;
+    transform: translate(121px, -67px) scale(0.5);
+  }
+  4% {
+    opacity: 1;
+    transform: translate(121px, -67px) scale(0.5);
+  }
+  /* seated in the 2x2x2 formation, held so the group is legible */
+  15%, 18% {
+    opacity: 1;
+    transform: translate(78px, -43px) scale(0.5);
+  }
+  21%, 100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.5);
+  }
+}
+@keyframes hc-shard7 {
+  0% {
+    opacity: 0;
+    transform: translate(-121px, -67px) scale(0.5);
+  }
+  4% {
+    opacity: 1;
+    transform: translate(-121px, -67px) scale(0.5);
+  }
+  /* seated in the 2x2x2 formation, held so the group is legible */
+  15%, 18% {
+    opacity: 1;
+    transform: translate(-78px, -43px) scale(0.5);
+  }
+  21%, 100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.5);
+  }
+}
+@keyframes hc-shard8 {
+  0% {
+    opacity: 0;
+    transform: translate(0px, -6px) scale(0.5);
+  }
+  4% {
+    opacity: 1;
+    transform: translate(0px, -6px) scale(0.5);
+  }
+  /* seated in the 2x2x2 formation, held so the group is legible */
+  15%, 18% {
+    opacity: 1;
+    transform: translate(0px, -4px) scale(0.5);
+  }
+  21%, 100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.5);
+  }
+}
+@keyframes hc-flash {
+  0%, 17% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  17% {
+    opacity: 0.55;
+    transform: scale(1.15);
+  }
+  24%, 100% {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+@keyframes hc-shock {
+  0%, 19% {
+    opacity: 0;
+    transform: scale(0.35);
+  }
+  19% {
+    opacity: 0.6;
+  }
+  32%, 100% {
+    opacity: 0;
+    transform: scale(2.3);
+  }
+}
+@keyframes hc-settle {
+  0%, 19% {
+    opacity: 0;
+    transform: scale(0.42);
+  }
+  22% {
+    opacity: 1;
+    transform: scale(1.035);
+  }
+  26% {
+    transform: scale(0.994);
+  }
+  30%, 88% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.42);
+  }
+}
+@keyframes hc-seam {
+  0%, 18% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  24% {
+    opacity: 0.24;
+    transform: scale(1.16);
+  }
+  30% {
+    opacity: 0.16;
+    transform: scale(1);
+  }
+  55% {
+    opacity: 0.26;
+    transform: scale(1);
+  }
+  86% {
+    opacity: 0.14;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+@keyframes hc-core {
+  0%, 19% {
+    opacity: 0;
+    transform: scale(0.25);
+  }
+  26% {
+    opacity: 0.24;
+    transform: scale(1.18);
+  }
+  32% {
+    opacity: 0.16;
+    transform: scale(1);
+  }
+  55% {
+    opacity: 0.26;
+    transform: scale(1);
+  }
+  86% {
+    opacity: 0.14;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.25);
+  }
+}
+@keyframes hc-halo {
+  0%, 16% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  30% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  55% {
+    opacity: 0.3;
+    transform: scale(1.04);
+  }
+  86% {
+    opacity: 0.18;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+@keyframes hc-sweep {
+  0%, 34% {
+    opacity: 0;
+    transform: translateX(-330px) skewX(-20deg);
+  }
+  38% {
+    opacity: 1;
+  }
+  72% {
+    opacity: 1;
+    transform: translateX(500px) skewX(-20deg);
+  }
+  73%, 100% {
+    opacity: 0;
+    transform: translateX(500px) skewX(-20deg);
+  }
+}
+@keyframes hc-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(46px);
+  }
+  10% {
+    opacity: 0.7;
+  }
+  46% {
+    opacity: 0;
+    transform: translateY(-250px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-250px);
+  }
+}
+/* The glow layers are large feGaussianBlur regions, and the sweep is a
+   gradient-filled rect under mix-blend-mode; both are expensive to rasterise.
+   Hint the compositor up front so every 10s loop starts on its own layer
+   instead of stalling to build one when the animation restarts. */
+.hc-svg g[filter],
+.hc-svg circle[fill^="url"],
+.hc-svg ellipse[fill^="url"],
+.hc-svg rect[fill^="url"] {
+  will-change: opacity, transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  /* hold the assembled cube: the form is the point, the reveal is decoration */
+  .hc-svg * {
+    animation: none !important;
+  }
+  .hc-svg g[style*="hc-shard"],
+  .hc-svg g[style*="hc-flash"],
+  .hc-svg g[style*="hc-shock"] {
+    opacity: 0;
+  }
+}
+/* the two hero animations share one slot, so neither is ever occluded */
+.stage-switch {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: flex-end;
+  margin-bottom: 0.7rem;
+}
+.stage-switch button {
+  font: inherit;
+  font-size: var(--step--1);
+  font-weight: 500;
+  color: var(--text-2);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.3em 0.95em;
+  cursor: pointer;
+  transition: color 0.16s ease, background 0.16s ease, border-color 0.16s ease;
+}
+.stage-switch button:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+.stage-switch button[aria-selected="true"] {
+  color: var(--on-accent);
+  background: var(--gradient-btn);
+  border-color: transparent;
+}
+
+/* ---- hero ---- */
+.hero {
+  position: relative;
+  overflow: clip;
+  padding: clamp(3rem, 6vw, 6rem) 0 clamp(3rem, 5vw, 5rem);
+}
+.hero-bg {
+  position: absolute;
+  inset: -20rem 0 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(46% 42% at 18% 8%, color-mix(in oklch, var(--brand-1) 22%, transparent), transparent 70%), radial-gradient(50% 46% at 82% 14%, color-mix(in oklch, var(--brand-2) 20%, transparent), transparent 72%), radial-gradient(60% 55% at 60% 0%, var(--accent-soft), transparent 70%);
+  -webkit-mask-image: radial-gradient(120% 95% at 50% 0%, #000 45%, transparent 95%);
+  mask-image: radial-gradient(120% 95% at 50% 0%, #000 45%, transparent 95%);
+}
+.hero h1 {
+  font-size: var(--step-4);
+  margin: 1.1rem 0 0;
+}
+.hero h1 .hl {
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.hero .sub {
+  font-size: var(--step-1);
+  color: var(--text-2);
+  max-width: 30ch;
+  margin: 1.3rem 0 0;
+  line-height: 1.45;
+}
+.hero-cta {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+/* ---- camera demo ---- */
+@keyframes blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.bbox {
+  position: absolute;
+  z-index: 2;
+  border: 2px solid var(--accent);
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 0 18px color-mix(in oklch, var(--accent) 30%, transparent);
+  opacity: 0;
+  transform: scale(0.94);
+  transition: opacity 0.45s var(--ease), transform 0.45s var(--ease);
+}
+.bbox.on {
+  opacity: 1;
+  transform: scale(1);
+}
+.bbox .tag {
+  position: absolute;
+  top: -1.55em;
+  left: -2px;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 600;
+  background: var(--accent);
+  color: #0a0d12;
+  padding: 0.1em 0.45em;
+  border-radius: 4px 4px 4px 0;
+  white-space: nowrap;
+}
+.bbox .corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border: 2px solid #fff;
+  opacity: 0.85;
+}
+
+/* ---- generic section ---- */
+section.block {
+  padding: clamp(3.5rem, 7vw, 6.5rem) 0;
+}
+.section-head {
+  max-width: 56ch;
+  margin-bottom: clamp(2rem, 4vw, 3.2rem);
+}
+.section-head .section-title {
+  margin-top: 0.8rem;
+}
+.section-head p {
+  color: var(--text-2);
+  font-size: var(--step-1);
+  margin: 0.9rem 0 0;
+}
+
+/* ---- pick your path ---- */
+.path-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding-top: 1.2rem;
+}
+.tag-pill {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-2);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.22rem 0.6rem;
+}
+.path-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--accent-text);
+  font-weight: 500;
+  font-size: 0.92rem;
+  margin-top: 1.1rem;
+}
+.path-link svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s var(--ease);
+}
+
+/* ---- terminal section ---- */
+.term-tab {
+  font-size: 0.72rem;
+  color: #6b7689;
+  padding: 0.28rem 0.7rem;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  font-family: var(--font-mono);
+  transition: color 0.2s, background 0.2s;
+}
+.term-tab.active {
+  color: var(--code-accent);
+  background: #131c27;
+}
+.term-prompt {
+  color: var(--code-accent);
+}
+.term-path {
+  color: #5d8bd6;
+}
+.term-cmd {
+  color: #e8eef6;
+}
+.term-out {
+  color: #7c889b;
+}
+.term-ok {
+  color: var(--code-accent);
+}
+.term-cursor {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.05em;
+  background: var(--accent);
+  vertical-align: -0.18em;
+  animation: blink 1s steps(2) infinite;
+}
+.copy-btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-2);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+  transition: color 0.18s, border-color 0.18s;
+}
+.copy-btn:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+.copy-btn.copied {
+  color: var(--accent-text);
+  border-color: var(--accent);
+}
+.copy-btn svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* ---- architecture stack ---- */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.layer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  color: inherit;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s var(--ease);
+}
+.layer:hover,
+.layer.active {
+  border-color: var(--accent);
+  transform: translateX(6px);
+}
+.layer.active {
+  background: var(--accent-soft);
+}
+.layer .lyr-ix {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-3);
+  width: 2ch;
+}
+.layer .lyr-name {
+  font-weight: 600;
+  font-size: 1rem;
+}
+.layer .lyr-tags {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-3);
+}
+.layer.hw {
+  background: linear-gradient(100deg, var(--accent-soft), transparent);
+  border-color: color-mix(in oklch, var(--accent) 40%, var(--border));
+}
+
+/* ---- benchmarks ---- */
+.bench-chart {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.6rem;
+  box-shadow: var(--shadow);
+}
+.bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  width: 0;
+  transition: width 1.1s var(--ease);
+}
+
+/* ---- footer ---- */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 3.5rem 0 2.5rem;
+  margin-top: 2rem;
+}
+.foot-grid {
+  display: grid;
+  grid-template-columns: 1.6fr repeat(3, 1fr);
+  gap: 2rem;
+}
+.foot-grid h4 {
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-3);
+  margin: 0 0 1rem;
+  font-weight: 500;
+}
+.foot-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.foot-links a {
+  color: var(--text-2);
+  font-size: 0.9rem;
+}
+.foot-links a:hover {
+  color: var(--text);
+}
+.foot-about p {
+  color: var(--text-2);
+  font-size: var(--step--1);
+  max-width: 34ch;
+  margin: 0.9rem 0 0;
+}
+.foot-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 3rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-3);
+  font-size: 0.82rem;
+  font-family: var(--font-mono);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* ---- search overlay ---- */
+.search-section {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+  padding: 0.6rem 0.7rem 0.3rem;
+}
+.search-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.65rem 0.7rem;
+  border-radius: 9px;
+  color: var(--text-2);
+  cursor: pointer;
+}
+.search-item:hover,
+.search-item.sel {
+  background: var(--surface-2);
+  color: var(--text);
+}
+/* keyboard cursor: an accent edge marker so the selected row is
+   distinguishable from whatever the pointer happens to be over */
+.search-item.sel {
+  position: relative;
+}
+.search-item.sel::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.35rem;
+  bottom: 0.35rem;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--gradient-btn);
+}
+.search-item .si-ic {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 7px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  display: grid;
+  place-items: center;
+}
+.search-item .si-ic svg {
+  width: 15px;
+  height: 15px;
+}
+.search-item .si-sub {
+  font-size: 0.78rem;
+  color: var(--text-3);
+}
+.search-item mark {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  border-radius: 3px;
+  padding: 0 0.1em;
+  font-weight: 600;
+}
+
+/* ---- scroll reveal (content ALWAYS visible; entrance animates transform only,
+   so a throttled/paused animation can never hide content) ---- */
+.reveal {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .reveal.in {
+    animation: reveal-in 0.6s var(--ease) both;
+  }
+}
+@keyframes reveal-in {
+  from {
+    transform: translateY(18px);
+  }
+  to {
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bbox {
+    animation: none;
+  }
+}
+
+/* ---- responsive ---- */
+@media (max-width: 980px) {
+  .nav-menu-btn {
+    display: flex;
+  }
+  /* collapsed: everything (page links + search/palette/theme/Discord/GitHub)
+     lives behind the hamburger, as a full-height off-canvas panel — same
+     slide-in pattern as .docs-side, so it reads as one consistent drawer
+     style across the whole site rather than a header dropdown */
+  .nav-drawer-head {
+    display: none;
+  }
+  .nav-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 80;
+    width: min(82vw, 300px);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.4rem;
+    background: var(--bg);
+    border-right: 1px solid var(--border);
+    padding: 1.2rem 1.2rem calc(1.4rem + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    transform: translateX(-102%);
+    transition: transform 0.28s var(--ease);
+  }
+  .nav-drawer.open {
+    transform: none;
+    box-shadow: var(--shadow);
+  }
+  .nav-drawer.open .nav-drawer-head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 600;
+    font-size: 1.05rem;
+    letter-spacing: -0.02em;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-drawer-head .logo {
+    width: 30px;
+    height: 30px;
+    flex: none;
+    border-radius: 8px;
+    background: var(--gradient-btn);
+    color: var(--on-accent);
+    display: grid;
+    place-items: center;
+  }
+  .nav-drawer-head .logo svg {
+    width: 17px;
+    height: 17px;
+  }
+  /* order within the drawer: brand head (0) → search (1) → page links (2)
+     → colour/theme/Discord/GitHub as their own row group at the very
+     bottom (3-6). .nav-tools is unwrapped via display:contents so its
+     children become direct flex items of .nav-drawer alongside .nav-links,
+     which is what lets `order` reshuffle them without touching the DOM. */
+  .nav-links {
+    order: 2;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  .nav-links a {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.75rem 0.85rem;
+    border-radius: 10px;
+    font-size: 1rem;
+  }
+  .nl-ic {
+    display: block;
+    width: 19px;
+    height: 19px;
+    flex: none;
+    color: var(--text-3);
+  }
+  .nav-tools {
+    display: contents;
+  }
+  /* the drawer reads as three blocks, in order: page tabs (.nav-links) →
+     appearance controls (Theme + Primary colour) → external links
+     (Discord/GitHub). Every row keeps the same plain icon+label look; a
+     dashed divider above the first item of each of the last two groups is
+     the only thing marking a new block. */
+  .nav-drawer a[aria-label="Discord"] {
+    order: 5;
+    margin-top: 0.6rem;
+    padding-top: 1.4rem;
+    border-top: 1px dashed var(--border);
+  }
+  .nav-drawer a[aria-label="GitHub"] {
+    order: 6;
+  }
+  .nav-drawer .icon-btn {
+    position: static;
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: flex-start;
+    gap: 0.8rem;
+    padding: 0.7rem 0.85rem;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+  }
+  .nav-drawer .icon-btn:hover {
+    background: var(--surface-2);
+  }
+  .nav-drawer .icon-btn svg {
+    width: 19px;
+    height: 19px;
+  }
+  .nav-drawer .icon-btn[data-tip]::after,
+  .nav-drawer .icon-btn[data-tip]::before {
+    display: none;
+  }
+  .nav-drawer .nt-label {
+    display: inline;
+    font-size: 1rem;
+    color: var(--text-2);
+  }
+  /* Theme starts the "appearance" block — same dashed-divider treatment as
+     Discord starting the "external links" block below. Using
+     .nav-drawer .icon-btn.theme-toggle (not the bare .theme-toggle class)
+     because .nav-drawer .icon-btn's own `border: 0` otherwise wins on
+     specificity and silently strips the divider back out. */
+  .nav-drawer .icon-btn.theme-toggle {
+    order: 3;
+    width: 100%;
+    margin-top: 0.6rem;
+    padding-top: 1.4rem;
+    border-top: 1px dashed var(--border);
+  }
+  .pal-picker {
+    order: 4;
+    width: 100%;
+  }
+  /* Primary colour otherwise stays a plain row, same as Theme/Discord/
+     GitHub — just with an expand chevron, since unlike the others it opens
+     an accordion instead of navigating straight away. */
+  .pal-picker .pal-trigger::after {
+    content: "";
+    width: 7px;
+    height: 7px;
+    margin-left: auto;
+    flex: none;
+    border-right: 2px solid var(--text-3);
+    border-bottom: 2px solid var(--text-3);
+    transform: rotate(45deg);
+    transition: transform 0.2s var(--ease);
+  }
+  .pal-picker.open .pal-trigger::after {
+    transform: rotate(225deg);
+    border-color: var(--accent-text);
+  }
+  .pal-trigger .pal-current {
+    width: 22px;
+    height: 22px;
+  }
+  /* the desktop popup (absolute, right-aligned) would float over the rows
+     below it here — instead it drops open inline, like an accordion, and
+     the swatches become a compact grid instead of a list of ten rows */
+  .pal-picker .pal-menu {
+    position: static;
+    display: none;
+    width: 100%;
+    min-width: 0;
+    margin-top: 0.1rem;
+    padding: 0.7rem 0.6rem 0.75rem;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid var(--border);
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .pal-picker.open .pal-menu {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.55rem;
+  }
+  .pal-picker .pal-menu-h {
+    display: none;
+  }
+  .pal-picker .pal-menu button {
+    position: relative;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.1rem 0.3rem;
+    font-size: 0.64rem;
+    line-height: 1.15;
+    text-align: center;
+    color: var(--text-3);
+  }
+  .pal-picker .pal-menu button:hover {
+    background: var(--surface);
+  }
+  .pal-picker .pal-menu button[aria-current="true"] {
+    color: var(--text);
+  }
+  .pal-picker .pal-menu .sw-dot {
+    width: 28px;
+    height: 28px;
+  }
+  .pal-picker .pal-menu button[aria-current="true"] .sw-dot {
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15), 0 0 0 2px var(--surface-2), 0 0 0 3.5px var(--accent-text);
+  }
+  .pal-picker .pal-menu button .tick {
+    position: absolute;
+    top: -3px;
+    right: 16%;
+    width: 13px;
+    height: 13px;
+    margin: 0;
+    padding: 1.5px;
+    border-radius: 50%;
+    background: var(--accent-text);
+    color: var(--on-accent);
+    box-shadow: 0 0 0 2px var(--surface-2);
+  }
+  .foot-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 560px) {
+  .foot-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero h1 {
+    font-size: clamp(2.4rem, 9vw, 3rem);
+  }
+}
+
+/* ============================================================
+   Shared form + overlay components
+   Self-contained (token-driven only) so the markup is portable —
+   used by the docs admin and documented in the design system.
+   ============================================================ */
+
+/* --- editor toolbar --- */
+
+/* --- modal --- */
+.modal {
+  width: min(100% - 2rem, 440px);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+}
+.modal h3 {
+  font-size: 1.2rem;
+}
+.modal p {
+  color: var(--text-2);
+  font-size: 0.88rem;
+  margin-top: 0.4rem;
+}
+
+
+/* ---- tabset -------------------------------------------------------------
+   Underline tabs for switching between peer views (online/offline install,
+   HTML/CSS panels). One panel visible at a time; the active tab carries the
+   accent underline. Toggled by main.js via [role=tab]/[role=tabpanel].
+   -------------------------------------------------------------------- */
+.tabset {
+  --tab-gap: 1.4rem;
+}
+.tablist {
+  display: flex;
+  gap: var(--tab-gap);
+  border-bottom: 1px solid var(--border);
+}
+.tablist button {
+  position: relative;
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 500;
+  color: var(--text-3);
+  background: none;
+  border: 0;
+  padding: 0.7rem 0 0.85rem;
+  cursor: pointer;
+  transition: color 0.16s ease;
+}
+.tablist button::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--gradient-btn);
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+.tablist button:hover {
+  color: var(--text);
+}
+.tablist button[aria-selected="true"] {
+  color: var(--accent-text);
+}
+.tablist button[aria-selected="true"]::after {
+  opacity: 1;
+}
+.tablist button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ---- switch / checkbox / radio ------------------------------------------
+   Native inputs restyled with appearance:none, so state, focus and keyboard
+   behaviour come for free. The label wrapper makes the whole row a hit target.
+   -------------------------------------------------------------------- */
+.switch input {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: none;
+  position: relative;
+  width: 40px;
+  height: 23px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+.switch input::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: #fff;
+  transform: translateY(-50%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: left 0.18s var(--ease);
+}
+.switch input:checked {
+  background: var(--gradient-btn);
+  border-color: transparent;
+}
+.switch input:checked::after {
+  left: 19px;
+}
+.switch input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---- floating pill nav ----------------------------------------------------
+   The bar detaches from the page edge and rides as a rounded, blurred pill so
+   page artwork reads as one continuous field behind it. Sticky (not fixed), so
+   no page needs a compensating top offset.
+   -------------------------------------------------------------------- */
+.site-header {
+  background: none;
+  border-bottom: 0;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.site-header .nav {
+  width: min(100% - 3rem, var(--maxw));
+  /* was 0.6rem right / 1.15rem left — on the mobile-width pill (logo on
+     the left, hamburger flush right) that ~9px gap difference reads as
+     lopsided since it's the same pill hugging most of the screen width.
+     Symmetric horizontal padding instead. */
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--surface) 82%, transparent);
+  border: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+  backdrop-filter: blur(18px) saturate(1.3);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  box-shadow: 0 10px 34px -18px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.3s, border-color 0.3s;
+}
+.site-header.scrolled .nav {
+  border-color: var(--border);
+  box-shadow: 0 14px 40px -20px rgba(0, 0, 0, 0.65);
+}

@@ -1,0 +1,11 @@
+{
+  "name": "iq-studio-site",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Static site assets for iQ-Studio. No build step — npm is used only to fetch self-hosted font files.",
+  "dependencies": {
+    "@fontsource-variable/noto-sans-tc": "^5.3.0",
+    "@fontsource-variable/work-sans": "^5.3.0",
+    "@fontsource/space-mono": "^5.3.0"
+  }
+}
