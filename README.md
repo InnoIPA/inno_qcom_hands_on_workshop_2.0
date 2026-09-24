@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  👉 <b>[<a href="https://innoipa.github.io/inno_qcom_hands_on_workshop/" style="color: #ff69b4; text-decoration: none;">Click Here to Access Web Platform</a>]</b> 👈
+  👉 <b>[<a href="https://innoipa.github.io/inno_qcom_hands_on_workshop_2.0/" style="color: #ff69b4; text-decoration: none;">Click Here to Access Web Platform</a>]</b> 👈
 </p>
 
 ---
@@ -28,7 +28,7 @@ Welcome to the **Hands-On Workshop Prep Site**. This is a self-contained, browse
 
 This web platform is divided into 6 structured sections, each covering one phase of the workshop:
 
-### 1. 🟢 [Overview](https://innoipa.github.io/inno_qcom_hands_on_workshop/Invitation%20-%20Innodisk%20x%20Qualcomm%20Workshop.html) — Live now
+### 1. 🟢 [Overview](https://innoipa.github.io/inno_qcom_hands_on_workshop_2.0/) — Live now
 The main landing page serves as the orientation center for the event.
 * **Prerequisite Fast-Track:** Direct entry into the Pre-Install guide.
 * **Interactive Agenda:** Full timeline of the workshop day, speaker-by-speaker.
@@ -36,7 +36,7 @@ The main landing page serves as the orientation center for the event.
 <img width="1385" height="735" alt="overview_preview" src="uploads\previews\overview_preview.png" />
 
 
-### 2. 🟢 [Pre-install Guide](https://innoipa.github.io/inno_qcom_hands_on_workshop/Pre-Install%20-%20Innodisk%20x%20Qualcomm%20Workshop.html) — Live now
+### 2. 🟢 [Pre-install Guide](https://innoipa.github.io/inno_qcom_hands_on_workshop_2.0/Pre-Install%20-%20Innodisk%20x%20Qualcomm%20Workshop.html) — Live now
 A Windows-focused environment preparation dashboard titled **"Get the Toolchain Ready."**
 * **Quick Walkthrough Video:** A short video card at the top previews the whole pre-install flow before diving in.
 * **Step-by-Step Instructions:** Interactive copy-to-clipboard code blocks for installing **Qualcomm Software Center (QSC)**, **PCAT Tool**, **QUD (Qualcomm USB Driver)**, and setting up **WSL2 + Ubuntu-22.04** — everything needed runs on a single Windows 11 host.
