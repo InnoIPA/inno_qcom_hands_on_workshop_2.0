@@ -16,7 +16,7 @@
 
 ---
 
-A self-contained, browser-native prep site for the **Qualcomm AI Hub × YOLO26 BYOM** workshop — pre-install → flashing → day-of script (FP32 → INT8 on the EXMP-Q911) → handouts. No cloning or downloads needed; bilingual (中文/English), dark/light theme, global search (`⌘K`).
+A self-contained, browser-native prep site for the **Qualcomm AI Hub × YOLO26 BYOM** workshop — pre-install → flashing → day-of script (FP32 → INT8 on the EXMP-Q911) → handouts. No cloning or downloads needed; bilingual (中文/English), dark/light theme.
 
 > **📅 Phased release.** Only **Overview** and **Pre-Install** are open now. **Flashing**, **Workshop Day Script**, **Handouts**, and **AI Tutorial** open on the workshop day (**2026.10.14, Wed**) — Flashing/Handouts show a disabled "Soon" badge until then.
 
