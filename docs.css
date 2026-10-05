@@ -255,8 +255,9 @@
   border-color: #3c4b68;
 }
 .code-copy.copied {
-  color: var(--accent);
-  border-color: var(--accent);
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.12);
+  border-color: rgba(74, 222, 128, 0.55);
 }
 .code-copy svg {
   width: 12px;
