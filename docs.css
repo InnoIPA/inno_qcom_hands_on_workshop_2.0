@@ -639,6 +639,11 @@
   flex: none; color: var(--text-2); background: var(--surface); border-color: var(--border);
 }
 .path-chip .code-copy:hover { color: var(--text); background: var(--surface); border-color: var(--border-strong); }
+.path-chip .code-copy.copied {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.12);
+  border-color: rgba(74, 222, 128, 0.55);
+}
 
 /* doc figures (real repo imagery) */
 .fig {
