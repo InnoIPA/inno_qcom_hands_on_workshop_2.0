@@ -1,4 +1,4 @@
-<h1 align="center"><span>🚀Hands-On Workshop🔥</span> Prep Site</h1>
+<h1 align="center"><span>🚀iQ Hands On Lab🔥</span> Prep Site</h1>
 
 <p align="center">
   <marquee direction="up" scrollamount="3" height="100px" style="background-color: #0d1117; border: 1px dashed #3b82f6; padding: 10px; border-radius: 6px; width: 100px; text-align: center;">
@@ -51,7 +51,7 @@ The core hands-on walkthrough: **Qualcomm AI Hub × YOLO26 — FP32 → INT8, de
 
 ### 5. 🔒 Handouts — Opens workshop day
 The on-site reference dashboard for physical and open-source materials.
-* **Checklist:** what to bring (a Windows 11 laptop) vs. what's provided (EXMP-Q911, cables, monitor, UVC camera).
+* **Checklist:** what to bring (a Windows 11 laptop) vs. what's provided (EXMP-Q911, cables, monitor, UVC Camera).
 * **Resource Portals:** links to iQ-Studio, iQ-Foundry, the Workshop Day Script, and the workshop package download.
 <img width="1328" height="842" alt="handouts_preview" src="uploads\previews\handouts_preview.png" />
 
