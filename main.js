@@ -466,7 +466,7 @@
   var searchResults = document.getElementById("searchResults");
   var INDEX = [
     { s: "Get Started", t: "Get Started — guided setup", h: "Get%20Started.html", g: "Get Started" },
-    { s: "Get Started", t: "30-Second Demo · live UVC camera feed", h: "30-Second%20Demo.html", g: "Get Started" },
+    { s: "Get Started", t: "30-Second Demo · live UVC Camera feed", h: "30-Second%20Demo.html", g: "Get Started" },
     { s: "Get Started", t: "How to Use iqs-launcher", h: "Docs.html", g: "Get Started" },
     { s: "Starting Guides", t: "Starting Guides Overview", h: "Starting%20Guides%20Overview.html", g: "Starting Guides" },
     { s: "Starting Guides", t: "Q911 Quick Start Guide", h: "Q911%20Quick%20Start%20Guide.html", g: "Starting Guides" },

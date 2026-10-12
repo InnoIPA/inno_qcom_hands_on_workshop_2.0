@@ -561,25 +561,6 @@ a:focus-visible {
 .nl-ic {
   display: none;
 }
-/* nav links to pages not yet deployed (opened day-of) — kept in the markup,
-   just non-interactive and visibly muted until the href is restored */
-.nav-links a.soon {
-  pointer-events: none;
-  cursor: not-allowed;
-  color: var(--text-3);
-}
-.nav-links a.soon .nl-soon-badge {
-  display: inline-block;
-  margin-left: 0.4rem;
-  padding: 0.05rem 0.4rem;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  font-size: 0.68rem;
-  font-weight: var(--fw-semibold);
-  letter-spacing: 0.02em;
-  color: var(--text-3);
-  vertical-align: 1px;
-}
 .nav-tools {
   display: flex;
   align-items: center;
@@ -1452,8 +1433,9 @@ section.block {
   border-color: var(--border-strong);
 }
 .copy-btn.copied {
-  color: var(--accent-text);
-  border-color: var(--accent);
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.12);
+  border-color: rgba(74, 222, 128, 0.55);
 }
 .copy-btn svg {
   width: 13px;

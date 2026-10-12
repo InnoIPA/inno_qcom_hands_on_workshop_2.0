@@ -640,11 +640,6 @@
   flex: none; color: var(--text-2); background: var(--surface); border-color: var(--border);
 }
 .path-chip .code-copy:hover { color: var(--text); background: var(--surface); border-color: var(--border-strong); }
-.path-chip .code-copy.copied {
-  color: #4ade80;
-  background: rgba(74, 222, 128, 0.12);
-  border-color: rgba(74, 222, 128, 0.55);
-}
 
 /* doc figures (real repo imagery) */
 .fig {
@@ -711,3 +706,15 @@
 .choice h3 {
   font-size: 1.15rem;
 }
+
+/* ---------- check table inside a callout: same look as other tables, white so it stands out ---------- */
+.table-wrap.chk-table { background: var(--surface); margin-top: 0.8rem; }
+.chk-table th:first-child,
+.chk-table td:first-child { width: 2.5rem; text-align: center; padding-right: 0; }
+.chk-table td { vertical-align: middle; }
+.chk-n { color: var(--text-3); }
+.chk-auto { color: var(--text-2); }
+.pass-green, .callout .ct-body strong.pass-green { color: var(--success); font-weight: 700; }
+/* table inside a collapsible: drop its own box so it sits flush in the faq */
+.faq .faq-body:has(> .chk-table) { padding: 0; background: var(--surface); }
+.faq .table-wrap.chk-table { border: 0; border-radius: 0; background: transparent; }
