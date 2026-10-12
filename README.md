@@ -31,7 +31,7 @@ The landing page and orientation center for the event.
 * **Event Details:** date, time, and venue (2026.10.14, Wed).
 <img width="1385" height="735" alt="overview_preview" src="uploads\previews\overview_preview.png" />
 
-### 2. 🟢 [Pre-install Guide](https://innoipa.github.io/inno_qcom_hands_on_workshop_2.0/Pre-Install%20-%20Innodisk%20x%20Qualcomm%20Workshop.html) — Live now
+### 2. 🟢 [Pre-install Guide](https://innoipa.github.io/inno_qcom_hands_on_workshop_2.0/Pre-Install.html) — Live now
 "Get the Toolchain Ready" — a Windows-focused environment prep dashboard.
 * **Walkthrough Video:** short preview of the whole pre-install flow up top.
 * **Step-by-Step Install:** copy-paste blocks for **QSC**, **PCAT**, **QUD**, and **WSL2 + Ubuntu-22.04** — all on one Windows 11 host.
