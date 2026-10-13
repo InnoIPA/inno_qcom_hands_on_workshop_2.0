@@ -46,7 +46,7 @@ An 8-step visual walkthrough for flashing the image onto the EXMP-Q911.
 ### 4. 🟢 [Workshop Day Script](https://innoipa.github.io/inno_qcom_hands_on_workshop_2.0/Script.html) — Live now
 The core hands-on walkthrough: **Qualcomm AI Hub × YOLO26 — FP32 → INT8, deployed on-device.** Steps 0 through 6.
 * **Offline-First:** AI Hub-dependent steps (4, 5.2, 5.5) have an offline/online toggle — offline is the default so nothing needs venue WiFi.
-* **Watch, Verify, Troubleshoot:** a short tutorial video per step, collapsible "what a good run looks like" logs, and a troubleshooting shortcut under each step.
+* **Watch, Verify, Troubleshoot:** a short tutorial video per step, collapsible "what a good run looks like" logs, and connection-issue and Quick Fix troubleshooting shortcuts that work from any step.
 <img width="1328" height="842" alt="script_preview" src="uploads\previews\script_preview.png" />
 
 ### 5. 🟢 [Handouts](https://innoipa.github.io/inno_qcom_hands_on_workshop_2.0/Handouts.html) — Live now
@@ -70,7 +70,7 @@ No Git or local server needed — just open it in a browser.
 1. Open the link your coordinators shared.
 2. **Prep at home:** work through **Pre-Install** (QSC, PCAT, QUD, WSL2 + Ubuntu-22.04).
 3. **On the day:** follow **Flashing**, then run **Script**'s Steps 0–6 in order (offline mode by default).
-4. **Stuck?** Use the "Having trouble?" shortcut under any step.
+4. **Stuck?** Use the "⚠ Connection issues" button at the top of the page.
 
 ---
 

@@ -752,6 +752,34 @@
 .install-nav-extra { margin-top: 0.6rem; padding-top: 0.6rem; border-top: 1px solid var(--border); }
 @media (max-width: 860px) { .install-nav-extra { display: contents; } }
 
+/* floating "need help?" — always visible while scrolling, so the
+   troubleshooting entry points are reachable from any step. z-index sits
+   below .ts-modal-overlay (200) so an open modal covers it. */
+.help-fab {
+  position: fixed; right: 1.2rem; bottom: 1.2rem; z-index: 150;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem;
+}
+.help-fab__btn {
+  font: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  padding: 0.6rem 1.1rem; border-radius: 999px;
+  color: var(--warn); background: var(--surface);
+  border: 1px solid color-mix(in oklab, var(--warn) 45%, var(--border));
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+.help-fab__btn:hover { border-color: var(--warn); background: color-mix(in oklab, var(--warn) 10%, var(--surface)); }
+.help-fab__menu {
+  display: flex; flex-direction: column; min-width: 11rem; padding: 0.3rem;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+.help-fab__menu[hidden] { display: none; }
+.help-fab__menu button {
+  font: inherit; font-size: 0.88rem; text-align: left; cursor: pointer;
+  padding: 0.5rem 0.7rem; border: 0; border-radius: 0.5rem;
+  background: none; color: var(--text-2);
+}
+.help-fab__menu button:hover { background: var(--accent-soft); color: var(--text); }
+
 /* ---- video-link: small pill chip for "watch the tutorial video" —
    repeats once per script step (Script page), so it needs to read as a
    light, repeatable affordance rather than a full CTA button. The play
